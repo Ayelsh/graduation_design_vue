@@ -1,7 +1,6 @@
 // 1.导入vue 、 路由模块 和 登录组件模块
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from '@/components/myLogin.vue'
 // 2.全局注册路由
 Vue.use(Router)
 
@@ -13,9 +12,16 @@ const router = new Router({
     },
     {
       path: '/login',
-      component: Login
-    },
-  ]
+      component: ()=>import("@/components/myLogin.vue")
+    },{
+      path: '/register',
+      component: ()=>import("@/components/myRegister.vue"),//懒加载
+      children:[
+      ]//如果有孩子
+    }
+   
+  ],
+  mode:'history'
 })
 
 // 4.导出路由对象

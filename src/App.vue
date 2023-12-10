@@ -1,17 +1,14 @@
 <template>
   <div id="app">
-    <Login msg="Welcome to Your Vue.js App"/>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Login from './components/myLogin.vue'
 
 export default {
   name: 'App',
-  components: {
-    Login
-  }
+ 
 }
 </script>
 

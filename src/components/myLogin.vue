@@ -29,6 +29,13 @@
                         </Popup>
                     </el-form-item>
                     <div class="unlogin">
+                        <div class="container"><button class="third-party-login" @click="thirdPartyLogin">
+                                <i class="fab fa-github"></i> <!-- GitHub 图标 -->
+                                GitHub
+                            </button>
+                            
+                        </div>
+                        <br>
                         <span class="longin_register" style="position: relative;" @click="forgetPwd">忘记密码？</span>
                         <span class="longin_register" style="position: relative;" @click="register">注册账户</span>
                     </div>
@@ -49,6 +56,7 @@ export default {
     name: "myLogin",
     components: {
         Popup
+
     },
     data: function () {
         return {
@@ -115,10 +123,10 @@ export default {
                 userName: userAccount,
                 password: userPassword
             }).then((response) => {
-                if (response.data.code === 200) { 
+                if (response.data.code === 200) {
                     self.$store.commit('setToken', response.data.data)
                     this.$router.push({ path: "/index" })
-                 }
+                }
                 else {
                     this.props.title = "登录失败"
                     this.message = response.data.data
@@ -215,5 +223,48 @@ export default {
 
 .unlogin a {
     color: #1890ff;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    /* 100% 视窗高度，确保按钮在垂直方向上居中 */
+}
+
+.third-party-login {
+    background-color: #2c3136;
+    /* GitHub 颜色 */
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+    position: relative;
+}
+
+.third-party-login i {
+    margin-right: 10px;
+}
+
+.third-party-login:hover {
+    background-color: #c9d4d4;
+    /* Hover 时的颜色 */
+}
+.icon-container {
+  width: 20px; /* 设置适当的宽度 */
+  height: 20px; /* 设置适当的高度 */
+}
+
+
+.icon {
+  width: 100%;
+  height: 100%;
 }
 </style>

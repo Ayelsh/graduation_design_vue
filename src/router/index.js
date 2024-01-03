@@ -18,6 +18,12 @@ const router = new Router({
       component: ()=>import("@/components/myRegister.vue"),//懒加载
       children:[
       ]//如果有孩子
+    },
+    {
+      path: '/index',
+      component: ()=>import("@/components/myIndex.vue"),//懒加载
+      children:[
+      ]//如果有孩子
     }
    
   ],

@@ -13,6 +13,7 @@ import './network/axios_config';
 import vuex from 'vuex';
 import store from './store/store.js';
 import VueParticles from 'vue-particles'
+import '@fortawesome/fontawesome-free/css/all.css'
 
 Vue.prototype.$http = axios;
 Vue.use(ElementUI);

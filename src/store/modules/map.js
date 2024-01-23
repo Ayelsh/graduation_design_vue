@@ -22,6 +22,9 @@ const state = {
     setToken (state, token) { // 布尔值 true
       console.log('Mutation setToken called');
       state.token = token;
+      console.log("token:"+token)
+      localStorage.setItem('token', JSON.stringify(token));
+      console.log(JSON.parse(localStorage.getItem('token')))
     },
     setIsShow (state, isShow) { // 布尔值 true
       state.isShow = isShow;

@@ -1,105 +1,295 @@
 <template>
-    <div class="forum-home">
-      <!-- 导航栏 -->
-      <nav>
-        <ul>
-          <li @click="navigate('home')">首页</li>
-          <li @click="navigate('hot')">热门主题</li>
-          <li @click="navigate('new')">最新帖子</li>
-          <li v-if="!userLoggedIn" @click="navigate('login')">登录</li>
-          <li v-if="!userLoggedIn" @click="navigate('register')">注册</li>
-          <li v-if="userLoggedIn" class="user-info">
-            <span>{{ username }}</span>
-            <button @click="logout">退出</button>
-          </li>
-        </ul>
-      </nav>
-  
-      <!-- 帖子列表 -->
-      <div class="post-list">
-        <div v-for="post in posts" :key="post.id" class="post">
-          <h2>{{ post.title }}</h2>
-          <p>{{ post.content }}</p>
-          <span>{{ post.author }} 发表于 {{ formatDate(post.timestamp) }}</span>
+  <div class="learning-forum" :class="{ 'nav-collapsed': isNavCollapsed }">
+    <el-container >
+      <el-header height = "40px"><!-- 头部区 -->
+        <div>
+          <img src="src/assets/icon-gitee.png" alt="" height="20px" />
+          <span>My Graduation_design</span>
         </div>
-      </div>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        userLoggedIn: false,
-        username: "",
-        currentPage: "home", // 当前页面标识
-        posts: [
-          {
-            id: 1,
-            title: "Vue.js 组件示例",
-            content: "这是一个简化的 Vue.js 组件示例。",
-            author: "JohnDoe",
-            timestamp: "2023-01-01T12:34:56",
-          },
-          // 其他帖子...
-        ],
-      };
+      </el-header>
+      <el-container>
+        <div class="toggle-btn" @click="toggleNav">☰</div>
+        <div class="navigation">
+          <div class="nav-header">
+            <div v-if="!isNavCollapsed" class="nav-title">
+              <span style="font-size: 10px;">导航栏</span>
+            </div>
+          </div>
+          <div v-if="!isNavCollapsed">
+            <!-- 使用 $router.push 跳转 -->
+            <div class="nav-item" :class="{ active: $route.path === '/Kali_Liunx' }" @click="$router.push('/Kali_Liunx')">
+              Kali_Liunx</div>
+            <div class="nav-item" :class="{ active: $route.path === '/myComments' }" @click="$router.push('/myComments')">
+              评论区</div>
+            <!-- 添加一些有意义的子菜单内容 -->
+            <div class="sub-menu" @click="toggleSubMenu">
+              <div class="menu-title">子菜单</div>
+              <div v-if="isSubMenuVisible">
+                <div class="sub-menu-item" @click="$router.push('/submenu/1')">子菜单项 1</div>
+                <div class="sub-menu-item" @click="$router.push('/submenu/2')">子菜单项 2</div>
+                <div class="sub-menu-item" @click="$router.push('/submenu/3')">子菜单项 3</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="user-info" @click="toggleUserInfo">
+          <img src="user-avatar.jpg" alt="User Avatar" class="avatar" ref="userAvatar" />
+          <div v-if="isUserInfoVisible" class="user-info-box" ref="userInfoBox">
+            <div class="user-info-item" @click="$router.push('/dashboard')">Link 1</div>
+            <div class="user-info-item" @click="$router.push('/profile')">Link 2</div>
+            <div class="user-info-item" @click="$router.push('/link/1')">Link 3</div>
+            <div class="user-info-item" @click="$router.push('/link/2')">Link 4</div>
+            <div class="user-info-item" @click="$router.push('/link/3')">Link 5</div>
+          </div>
+        </div>
+        <div class="content">
+          <router-view></router-view>
+        </div>
+      </el-container>
+    </el-container>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      isNavCollapsed: false,
+      isUserInfoVisible: false,
+      isSubMenuVisible: false,
+      key: 0,
+    };
+  },
+  created() {
+    this.$router.push('/Kali_Liunx')
+  },
+  methods: {
+    toggleNav() {
+      this.isNavCollapsed = !this.isNavCollapsed;
     },
-    methods: {
-      logout() {
-        // 实际应用中应该向后端发起退出登录请求
-        this.userLoggedIn = false;
-        this.username = "";
-        this.navigate("home");
-      },
-      navigate(page) {
-        // 页面导航逻辑
-        this.currentPage = page;
-        // 实际应用中可能需要使用路由进行导航
-      },
-      formatDate(timestamp) {
-        // 格式化时间戳
-        const date = new Date(timestamp);
-        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-      },
+    toggleUserInfo() {
+      this.isUserInfoVisible = !this.isUserInfoVisible;
+      if (this.isUserInfoVisible) {
+        this.$nextTick(() => {
+          this.positionUserInfoBox();
+        });
+      }
     },
-  };
-  </script>
-  
-  <style scoped>
-  .forum-home {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  nav {
-    background-color: #333;
-    padding: 10px;
-    color: white;
-  }
-  
-  nav ul {
-    list-style-type: none;
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  .user-info {
+    toggleSubMenu() {
+      this.isSubMenuVisible = !this.isSubMenuVisible;
+    },
+    positionUserInfoBox() {
+      const userInfoBox = this.$refs.userInfoBox;
+      const userAvatar = this.$refs.userAvatar;
+      if (userInfoBox && userAvatar) {
+        const userInfoBoxRect = userInfoBox.getBoundingClientRect();
+        const userAvatarRect = userAvatar.getBoundingClientRect();
+        const top = userAvatarRect.top - userInfoBoxRect.height;
+        const left = userAvatarRect.left + userAvatarRect.width / 2 - userInfoBoxRect.width / 2;
+        userInfoBox.style.top = `${top}px`;
+        userInfoBox.style.left = `${left}px`;
+      }
+    },
+    logout() {
+      // Add your logout logic here
+    },
+  },
+};
+</script>
+
+<style scoped>
+.learning-forum {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.nav-collapsed .navigation {
+  width: 0;
+}
+
+.toggle-btn {
+  cursor: pointer;
+  padding: 10px;
+  color: #fff;
+  font-size: 20px;
+  background-color: #333;
+}
+
+.navigation {
+  width: 15%;
+  background-color: #333;
+  padding: 20px;
+  color: #fff;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.nav-item {
+  position: relative;
+  margin-bottom: 8px;
+  /* 添加链接之间的小间隔 */
+  padding-left: 10px;
+  /* 添加左边距 */
+}
+
+.nav-item:first-child {
+  margin-top: 8px;
+  /* 第一个导航链接与上方有相同间隔 */
+}
+
+.nav-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(169, 169, 169, 0.5);
+  /* 悬停时使用较低透明度的遮罩 */
+  opacity: 0;
+  border-radius: 5px;
+  transition: opacity 0.3s ease, border-radius 0.3s ease;
+}
+
+.nav-item:hover::before {
+  opacity: 0.2;
+  /* 悬停时的透明度 */
+}
+
+.nav-item.active::before {
+  opacity: 0.4;
+  border-radius: 5px;
+}
+
+.nav-item.active {
+  background-color: transparent;
+  /* 被选中时背景透明 */
+  color: #fff;
+  /* 字体颜色不更改 */
+}
+
+
+
+.nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #555;
+}
+
+.sub-menu {
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.menu-title {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.nav-item,
+.sub-menu-item,
+.user-info-item {
+  cursor: pointer;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #fff;
+}
+
+.user-info {
+  cursor: pointer;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.user-info-box {
+  position: absolute;
+  background-color: #333;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.user-info-box router-link {
+  color: #fff;
+  text-decoration: none;
+  padding: 5px 0;
+}
+
+.user-info-box router-link:hover {
+  background-color: #555;
+}
+
+.user-info:hover .user-info-box {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.nav-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.navigation a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 0;
+  font-size: 16px;
+}
+
+.navigation a:hover {
+  background-color: #555;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: margin 0.3s ease;
+}
+
+.xterm-container {
+  flex: 1;
+  overflow: hidden;
+}
+
+.comments {
+  overflow: hidden;
+}
+.el-header {
+  background-color: #373d41;
+  display: flex;
+  justify-content: space-between;
+  padding-left: 0;
+  align-items: center;
+  color: #fff;
+  font-size: 15px; /* 调整字体大小 */
+  height: 40px;
+  >div {
     display: flex;
     align-items: center;
-    margin-left: 10px;
+
+    span {
+      margin-left: 10px;
+    }
   }
-  
-  .post-list {
-    margin-top: 20px;
-  }
-  
-  .post {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
-  }
-  
-  </style>
-  
+}
+</style>

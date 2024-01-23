@@ -1,5 +1,5 @@
 <template>
-    <transition name="fullscreen">
+    
       <div class="register">
         <vue-particles id="particles-js" color="#fff" :particleOpacity="0.7" :particlesNumber="60" shapeType="circle"
                 :particleSize="4" linesColor="#fff" :linesWidth="1" :lineLinked="true" :lineOpacity="0.4"
@@ -39,7 +39,7 @@
           </el-form>
         </div>
       </div>
-    </transition>
+    
   </template>
   
   <script>

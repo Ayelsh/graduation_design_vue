@@ -11,7 +11,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 //------------------请求拦截-------------------//
 //------------在发送请求之前做些什么------------//
 axios.interceptors.request.use(config => {
-
+    console.log("1111111111111111111111111进入请求拦截器")
     //例：若存在token则带token
     const token = store.state.token;
     if (token) {

@@ -29,7 +29,8 @@
                         </Popup>
                     </el-form-item>
                     <div class="unlogin">
-                        <div class="container"><button class="third-party-login" @click="thirdPartyLogin">
+                        <!-- //@click="thirdPartyLogin" -->
+                        <div class="container"><button class="third-party-login" >
                                 <i class="fab fa-github"></i> <!-- GitHub 图标 -->
                                 GitHub
                             </button>
@@ -86,6 +87,7 @@ export default {
                 // 7. 设置主题色
                 themeColor: '#cc6699',
                 showModule: false,
+                
                 message: '请联系管理员'
 
             },
@@ -101,7 +103,7 @@ export default {
             const userAccount = this.loginForm.account;
             const userPassword = this.loginForm.passWord;
             const instance = axios.create({
-                baseURL: 'http://localhost:80',
+                baseURL: 'http://127.0.0.1:80',
             });
 
 
@@ -124,7 +126,7 @@ export default {
                 password: userPassword
             }).then((response) => {
                 if (response.data.code === 200) {
-                    self.$store.commit('setToken', response.data.data)
+                    self.$store.commit('setToken', response.data.data.token)
                     this.$router.push({ path: "/index" })
                 }
                 else {

@@ -1,7 +1,7 @@
 <template>
   <div class="learning-forum" :class="{ 'nav-collapsed': isNavCollapsed }">
-    <el-container >
-      <el-header height = "40px"><!-- 头部区 -->
+    <el-container>
+      <el-header height="40px"><!-- 头部区 -->
         <div>
           <img src="src/assets/icon-gitee.png" alt="" height="20px" />
           <span>My Graduation_design</span>
@@ -21,6 +21,12 @@
               Kali_Liunx</div>
             <div class="nav-item" :class="{ active: $route.path === '/myComments' }" @click="$router.push('/myComments')">
               评论区</div>
+            <div class="nav-item" :class="{ active: $route.path === 'user_profile' }"
+              @click="$router.push('/user/profile')">
+              我的信息</div>
+            <div class="nav-item"
+              @click="$router.push('/myBlog')">
+              论坛</div>
             <!-- 添加一些有意义的子菜单内容 -->
             <div class="sub-menu" @click="toggleSubMenu">
               <div class="menu-title">子菜单</div>
@@ -274,6 +280,7 @@ export default {
 .comments {
   overflow: hidden;
 }
+
 .el-header {
   background-color: #373d41;
   display: flex;
@@ -281,8 +288,10 @@ export default {
   padding-left: 0;
   align-items: center;
   color: #fff;
-  font-size: 15px; /* 调整字体大小 */
+  font-size: 15px;
+  /* 调整字体大小 */
   height: 40px;
+
   >div {
     display: flex;
     align-items: center;
@@ -291,5 +300,4 @@ export default {
       margin-left: 10px;
     }
   }
-}
-</style>
+}</style>

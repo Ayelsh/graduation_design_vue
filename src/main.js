@@ -17,6 +17,8 @@ import store from './store/store.js';
 import VueParticles from 'vue-particles'
 //图片库
 import '@fortawesome/fontawesome-free/css/all.css'
+//轮播图组件
+import 'vant/lib/index.css';
 
 
 

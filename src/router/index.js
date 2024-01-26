@@ -39,6 +39,17 @@ const router = new Router({
       name: 'myComments',
       component: () => import("@/components/myComments.vue")
     },
+    {
+      path: '/user/profile',
+      name: 'user_profile',
+      component: () => import("@/components/myUserInfo.vue")
+    },
+    {
+      path: '/myBlog',
+      name: 'myBlog',
+      component: () => import("@/components/myBlog.vue")
+    },
+    
     ]//如果有孩子
   },
 

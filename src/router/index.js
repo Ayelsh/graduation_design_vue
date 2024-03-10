@@ -19,7 +19,8 @@ const router = new Router({
   {
     path: '/login',
     component: () => import("@/components/myLogin.vue")
-  }, {
+  },
+  {
     path: '/register',
     component: () => import("@/components/myRegister.vue"),//懒加载
     children: [
@@ -47,12 +48,24 @@ const router = new Router({
     {
       path: '/myBlog',
       name: 'myBlog',
-      component: () => import("@/components/myBlog.vue")
+      component: () => import("@/components/myBlog.vue"),
+      // children: [
+      //   {
+      //     path: '/postPage',
+      //     name: 'postPage',
+      //     component: () => import("@/components/myPostPage.vue")
+      //   },
+      // ]
+    },
+    {
+      path: '/postPage',
+      name: 'postPage',
+      component: () => import("@/components/myPostPage.vue")
     },
     
     ]//如果有孩子
   },
-
+  
 
 
   ],

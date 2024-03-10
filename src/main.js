@@ -19,10 +19,12 @@ import VueParticles from 'vue-particles'
 import '@fortawesome/fontawesome-free/css/all.css'
 //轮播图组件
 import 'vant/lib/index.css';
+// import instance from './http'
+ 
+// Vue.prototype.$axios = instance
 
 
-
-Vue.prototype.$http = axios;
+Vue.prototype.$axios = axios;
 Vue.use(ElementUI);
 Vue.use(vuex);
 Vue.use(VueParticles);

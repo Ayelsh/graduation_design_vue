@@ -1,10 +1,11 @@
 import axios from 'axios'
-import store from '../store/store'
+// import store from '../store/store'
 //单独引入element的Message组件，以使用
 import { Message } from 'element-ui'
 
 //配置基础url、超时时间、post请求头
-axios.defaults.baseURL = 'http://localhost:80';
+
+axios.defaults.baseURL = 'http://127.0.0.1:80';
 axios.defaults.timeout = 5000;
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -13,9 +14,12 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.interceptors.request.use(config => {
     console.log("1111111111111111111111111进入请求拦截器")
     //例：若存在token则带token
-    const token = store.state.token;
+    
+
+    const token = localStorage.getItem('token');
+    console.log(token.slice(1, token.length - 1))
     if (token) {
-        config.headers.Authorization = token
+        config.headers.token = token.slice(1, token.length - 1)
     }
     console.log("请求查看："+config)
     return config;

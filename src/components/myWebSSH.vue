@@ -90,7 +90,7 @@ export default {
               "operate": "command",
               "command": shellCommand + "\r",
               "host": "127.0.0.1",
-              "port": "20",
+              "port": "22",
               "username": "test",
               "password": "962464"
             }
@@ -133,7 +133,7 @@ export default {
         "operate": "connect",
         "command": "command",
         "host": "127.0.0.1",
-        "port": 20,
+        "port": 22,
         "username": "test",
         "password": "962464"
       };

@@ -67,7 +67,7 @@ export default {
     };
   },
   created() {
-    this.$router.push('/Kali_Liunx')
+    this.$router.push('/myBlog')
   },
   methods: {
     toggleNav() {

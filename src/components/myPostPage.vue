@@ -1,6 +1,6 @@
 <template>
     <div class="blog-post">
-        <h1 class="post-title">{{ post.title }}</h1>
+        <h1 class="post-title">{{ post.articleTitle }}</h1>
         <p class="author">作者：{{ post.author }}</p>
         <div class="post-content" v-html="compiledMarkdown" style="max-height: 100vh; overflow-y: auto;"></div>
     </div>

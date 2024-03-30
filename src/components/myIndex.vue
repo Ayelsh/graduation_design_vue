@@ -1,51 +1,44 @@
 <template>
   <div class="learning-forum" :class="{ 'nav-collapsed': isNavCollapsed }">
     <el-container>
-      <el-header height="40px"><!-- 头部区 -->
-        <div>
-          <img src="src/assets/icon-gitee.png" alt="" height="20px" />
-          <span>My Graduation_design</span>
-        </div>
+      <el-header height="50px"><!-- 头部区 -->
+        <el-row style="display: flex; align-items: center;">
+          <img src="@/assets/icon-gitee.svg" alt="" height="30px" />
+          <span class="brand-name">My Graduation Design</span>
+          <div class="user-info" @click="toggleUserInfo">
+            <img class="avatar" src="@/assets/user-admin.jpg" alt="User Avatar" />
+            <div class="user-info-box" v-if="isUserInfoVisible">
+              <router-link :to="{ name: 'user_profile' }" class="user-info-item">个人信息</router-link>
+              <a href="#" class="user-info-item">设置</a>
+              <a class="user-info-item" @click="logout">退出登录</a>
+            </div>
+          </div>
+        </el-row>
       </el-header>
       <el-container>
-        <div class="toggle-btn" @click="toggleNav">☰</div>
-        <div class="navigation">
+
+        <div class="navigation" :class="{ 'nav-collapsed': isNavCollapsed }">
+          <div class="toggle-btn" @click="toggleNav">☰</div>
           <div class="nav-header">
-            <div v-if="!isNavCollapsed" class="nav-title">
-              <span style="font-size: 10px;">导航栏</span>
-            </div>
+            <div class="nav-title">导航栏</div>
           </div>
-          <div v-if="!isNavCollapsed">
-            <!-- 使用 $router.push 跳转 -->
-            <div class="nav-item" :class="{ active: $route.path === '/Kali_Liunx' }" @click="$router.push('/Kali_Liunx')">
-              Kali_Liunx</div>
-            <div class="nav-item" :class="{ active: $route.path === '/myComments' }" @click="$router.push('/myComments')">
-              评论区</div>
-            <div class="nav-item" :class="{ active: $route.path === 'user_profile' }"
-              @click="$router.push('/user/profile')">
-              我的信息</div>
-            <div class="nav-item"
-              @click="$router.push('/myBlog')">
-              论坛</div>
-            <!-- 添加一些有意义的子菜单内容 -->
+          <div>
+            <router-link to="/myBlog" class="nav-item" :class="{ active: $route.name === 'myBlog' }">论坛</router-link>
+            <router-link :to="{ name: 'updateUserInfo' }" class="nav-item"
+              :class="{ active: $route.name === 'updateUserInfo' }">修改我的信息</router-link>
+            <router-link :to="{ name: 'KaliLiunx' }" class="nav-item"
+              :class="{ active: $route.name === 'KaliLiunx' }">Kali攻击机</router-link>
+            <router-link :to="{ name: 'MsfLiunx' }" class="nav-item"
+              :class="{ active: $route.name === 'MsfLiunx' }">MSF靶机</router-link>
             <div class="sub-menu" @click="toggleSubMenu">
-              <div class="menu-title">子菜单</div>
-              <div v-if="isSubMenuVisible">
-                <div class="sub-menu-item" @click="$router.push('/submenu/1')">子菜单项 1</div>
-                <div class="sub-menu-item" @click="$router.push('/submenu/2')">子菜单项 2</div>
-                <div class="sub-menu-item" @click="$router.push('/submenu/3')">子菜单项 3</div>
-              </div>
+              <div class="menu-title">Linux</div>
+              <transition name="fade">
+                <div v-if="isSubMenuVisible">
+
+                  <router-link class="sub-menu-item" :to="{ name: 'Level1' }">Level1：破译</router-link>
+                </div>
+              </transition>
             </div>
-          </div>
-        </div>
-        <div class="user-info" @click="toggleUserInfo">
-          <img src="user-avatar.jpg" alt="User Avatar" class="avatar" ref="userAvatar" />
-          <div v-if="isUserInfoVisible" class="user-info-box" ref="userInfoBox">
-            <div class="user-info-item" @click="$router.push('/dashboard')">Link 1</div>
-            <div class="user-info-item" @click="$router.push('/profile')">Link 2</div>
-            <div class="user-info-item" @click="$router.push('/link/1')">Link 3</div>
-            <div class="user-info-item" @click="$router.push('/link/2')">Link 4</div>
-            <div class="user-info-item" @click="$router.push('/link/3')">Link 5</div>
           </div>
         </div>
         <div class="content">
@@ -57,17 +50,19 @@
 </template>
 
 <script>
+import { Message } from 'element-ui';
+
 export default {
   data() {
     return {
       isNavCollapsed: false,
       isUserInfoVisible: false,
       isSubMenuVisible: false,
-      key: 0,
     };
   },
-  created() {
-    this.$router.push('/myBlog')
+  mounted() {
+    // 导航到论坛页面
+    this.$router.push({ name: 'myBlog' });
   },
   methods: {
     toggleNav() {
@@ -75,142 +70,59 @@ export default {
     },
     toggleUserInfo() {
       this.isUserInfoVisible = !this.isUserInfoVisible;
-      if (this.isUserInfoVisible) {
-        this.$nextTick(() => {
-          this.positionUserInfoBox();
-        });
-      }
     },
     toggleSubMenu() {
       this.isSubMenuVisible = !this.isSubMenuVisible;
     },
-    positionUserInfoBox() {
-      const userInfoBox = this.$refs.userInfoBox;
-      const userAvatar = this.$refs.userAvatar;
-      if (userInfoBox && userAvatar) {
-        const userInfoBoxRect = userInfoBox.getBoundingClientRect();
-        const userAvatarRect = userAvatar.getBoundingClientRect();
-        const top = userAvatarRect.top - userInfoBoxRect.height;
-        const left = userAvatarRect.left + userAvatarRect.width / 2 - userInfoBoxRect.width / 2;
-        userInfoBox.style.top = `${top}px`;
-        userInfoBox.style.left = `${left}px`;
-      }
-    },
     logout() {
-      // Add your logout logic here
-    },
+      var url = "/user/logout"
+      this.$axios.delete(url).then((response) => {
+        console.log(response)
+        if (response.code === 200) {
+          localStorage.clear();
+          this.$router.push({ path: "/login" })
+        } else {
+          Message({
+            message: '登出失败',
+            type: 'warning'
+          })
+        }
+      }).catch((error) => {
+        console.log("请求失败" + error);
+      });
+
+    }
   },
 };
 </script>
 
 <style scoped>
+* {
+  user-select: none;
+
+}
+
 .learning-forum {
   display: flex;
   height: 100vh;
-  overflow: hidden;
   transition: all 0.3s ease;
 }
 
-.nav-collapsed .navigation {
-  width: 0;
+.el-header {
+  background-color: #303030;
+  color: #ffffff;
 }
 
-.toggle-btn {
-  cursor: pointer;
-  padding: 10px;
-  color: #fff;
+.brand-name {
+  margin-left: 10px;
   font-size: 20px;
-  background-color: #333;
-}
-
-.navigation {
-  width: 15%;
-  background-color: #333;
-  padding: 20px;
-  color: #fff;
-  transition: width 0.3s ease;
-  position: relative;
-}
-
-.nav-item {
-  position: relative;
-  margin-bottom: 8px;
-  /* 添加链接之间的小间隔 */
-  padding-left: 10px;
-  /* 添加左边距 */
-}
-
-.nav-item:first-child {
-  margin-top: 8px;
-  /* 第一个导航链接与上方有相同间隔 */
-}
-
-.nav-item::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(169, 169, 169, 0.5);
-  /* 悬停时使用较低透明度的遮罩 */
-  opacity: 0;
-  border-radius: 5px;
-  transition: opacity 0.3s ease, border-radius 0.3s ease;
-}
-
-.nav-item:hover::before {
-  opacity: 0.2;
-  /* 悬停时的透明度 */
-}
-
-.nav-item.active::before {
-  opacity: 0.4;
-  border-radius: 5px;
-}
-
-.nav-item.active {
-  background-color: transparent;
-  /* 被选中时背景透明 */
-  color: #fff;
-  /* 字体颜色不更改 */
-}
-
-
-
-.nav-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #555;
-}
-
-.sub-menu {
-  margin-top: 10px;
-  cursor: pointer;
-}
-
-.menu-title {
-  font-size: 14px;
-  color: #888;
-  margin-bottom: 5px;
-}
-
-.nav-item,
-.sub-menu-item,
-.user-info-item {
-  cursor: pointer;
-  padding: 10px 0;
-  font-size: 16px;
-  color: #fff;
 }
 
 .user-info {
+  margin-left: auto;
+  margin-right: 20px;
   cursor: pointer;
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
+  position: relative;
 }
 
 .avatar {
@@ -221,30 +133,57 @@ export default {
 
 .user-info-box {
   position: absolute;
-  background-color: #333;
-  padding: 10px;
+  top: 60px;
+  right: 20px;
+  background-color: #ffffff;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 10px;
+  transition: opacity 0.3s ease;
   opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.user-info-box router-link {
-  color: #fff;
-  text-decoration: none;
-  padding: 5px 0;
-}
-
-.user-info-box router-link:hover {
-  background-color: #555;
 }
 
 .user-info:hover .user-info-box {
   opacity: 1;
-  transform: translateY(0);
+}
+
+.user-info-item {
+  display: block;
+  color: #303030;
+  padding: 8px;
+  
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.user-info-item:hover {
+  background-color: #f0f0f0;
+}
+
+.toggle-btn {
+  cursor: pointer;
+  padding: 10px;
+  color: #ffffff;
+  font-size: 20px;
+  background-color: #303030;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background-color: #404040;
+}
+
+.navigation {
+  background-color: #404040;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.nav-header {
+  padding: 10px 20px;
+  border-bottom: 1px solid #505050;
 }
 
 .nav-title {
@@ -252,52 +191,71 @@ export default {
   font-weight: bold;
 }
 
-.navigation a {
+.nav-item {
   display: block;
-  color: #fff;
+  padding: 10px 20px;
   text-decoration: none;
-  padding: 10px 0;
-  font-size: 16px;
+  color: #ffffff;
+  transition: all 0.3s ease;
 }
 
-.navigation a:hover {
-  background-color: #555;
+.nav-item:hover {
+  background-color: #505050;
+}
+
+.active {
+  background-color: #505050;
+}
+
+.sub-menu {
+  padding: 10px 20px;
+}
+
+.menu-title {
+  font-size: 16px;
+  color: #c0c0c0;
+}
+
+.sub-menu-item {
+  padding: 8px 20px;
+  color: #ffffff;
+  text-decoration: none;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.sub-menu-item:hover {
+  background-color: #505050;
 }
 
 .content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   transition: margin 0.3s ease;
 }
 
-.xterm-container {
-  flex: 1;
-  overflow: hidden;
+.nav-collapsed .navigation {
+  width: 60px;
 }
 
-.comments {
-  overflow: hidden;
+.nav-collapsed .nav-header,
+.nav-collapsed .nav-item,
+.nav-collapsed .sub-menu,
+.nav-collapsed .sub-menu-item {
+  display: none;
 }
 
-.el-header {
-  background-color: #373d41;
-  display: flex;
-  justify-content: space-between;
-  padding-left: 0;
-  align-items: center;
-  color: #fff;
-  font-size: 15px;
-  /* 调整字体大小 */
-  height: 40px;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
 
-  >div {
-    display: flex;
-    align-items: center;
+.fade-enter,
+.fade-leave-to
 
-    span {
-      margin-left: 10px;
-    }
-  }
-}</style>
+/* .fade-leave-active in <2.1.8 */
+  {
+  opacity: 0;
+}
+</style>

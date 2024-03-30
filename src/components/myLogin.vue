@@ -29,7 +29,6 @@
                         </Popup>
                     </el-form-item>
                     <div class="unlogin">
-                        <!-- //@click="thirdPartyLogin" -->
                         <div class="container"><button class="third-party-login" >
                                 <i class="fab fa-github"></i> <!-- GitHub 图标 -->
                                 GitHub

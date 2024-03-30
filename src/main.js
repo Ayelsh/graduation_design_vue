@@ -29,6 +29,17 @@ Vue.use(ElementUI);
 Vue.use(vuex);
 Vue.use(VueParticles);
 
+router.beforeEach((to, from, next) => {
+  
+  const isAuthenticated = localStorage.getItem('token');/* 判断用户是否已登录，例如从后端获取用户信息判断 */
+  if (to.meta.requireAuth && !isAuthenticated) {
+    // 如果需要登录但用户未登录，则跳转到登录页面
+    next('/login');
+  } else {
+    // 如果不需要登录或用户已登录，则允许路由跳转
+    next();
+  }
+});
 
 new Vue({
   //全局注册router

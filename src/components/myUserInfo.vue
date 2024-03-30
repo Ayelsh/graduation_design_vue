@@ -1,141 +1,282 @@
 <template>
-  <div class="profile-container">
-    <form @submit.prevent="updateProfile" class="profile-form">
-      <div class="form-header">
-        <h1>User Profile</h1>
-      </div>
+  <div>
+    <div class="profile-header">
+      <img class="avatar-wrapper" :src=imageUrl alt="用户头像">
+    </div>
 
-      <div class="form-group">
-        <label for="username">Username:</label>
-        <div class="input-container">
-          <input type="text" id="username" v-model="userInfo.username" readonly>
+
+    <div class="profile-details">
+      <div class="grid-container">
+
+        <div class="detail-item" v-for="(value, key) in userInfo" :key="key" v-show="key !== 'avatar'">
+
+          <div class="detail-icon">
+            <i class="fas" :class="iconClass(key)"></i>
+          </div>
+
+          <div class="detail-content">
+            <p style="text-align: left;">{{ value }}</p>
+            <p style=" font-size: 15px;  color: cadetblue;">{{ key }}</p>
+          </div>
+
         </div>
+
       </div>
-
-      <div class="form-group">
-        <label for="email">Email:</label>
-        <div class="input-container">
-          <input type="email" id="email" v-model="userInfo.email" readonly>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="fullname">Full Name:</label>
-        <div class="input-container">
-          <input type="text" id="fullname" v-model="userInfo.fullname">
-        </div>
-      </div>
-
-      <!-- 其他用户信息字段 -->
-
-      <button type="submit">Update Profile</button>
-    </form>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
+
+
   data() {
     return {
-      userInfo: {}
+      userInfo: {
+        userName: 'John Doe',
+        status: '',
+        sex: '',
+        userType: '',
+        nickName: '',
+        avatar: '',
+        email: 'john@example.com',
+        phoneNumber: '123-456-7890'
+        // 添加其他个人信息字段
+      },
+      imageUrl: '',
+      props: {
+        size: 'small',
+        title: 'warning',
+        btn: 3,
+        submitBtn: 'submit',
+        cancelBtn: 'cancel',
+        mask: true,
+        transition: 'top',
+        themeColor: '#cc6699',
+        showModule: false,
+        message: '请联系管理员'
+      }
     };
   },
   created() {
-    // 在组件创建时从后端获取用户信息
-    this.fetchUserInfo();
+    this.initPage();
+
+  },
+  mounted() {
+
   },
   methods: {
-    fetchUserInfo() {
-      // 使用Vue Resource、Axios或其他方式从后端获取用户信息
-      // 示例中使用setTimeout模拟异步请求
-      setTimeout(() => {
-        // 假设后端返回的用户信息包含username、email和fullname字段
-        this.userInfo = {
-          username: 'user123',
-          email: 'user@example.com',
-          fullname: 'John Doe'
-          // 添加其他用户信息字段
-        };
-      }, 500);
+    initPage() {
+      this.$axios.get('/user/userInfo').then((response) => {
+        if (response.code === 200) {
+          this.userInfo = response.data;
+          this.loadImage();
+        } else {
+          this.props.title = "请求失败";
+          this.message = response.msg;
+          this.showPopup();
+        }
+      });
     },
-    updateProfile() {
-      // 在这里实现更新用户信息的逻辑，可以通过Vue Resource、Axios或其他方式与后端交互
-      console.log('Updating profile:', this.userInfo);
+    loadImage() {
+
+      const filename = this.userInfo.avatar; // 图片文件名
+      console.log("文件名：", filename)
+      this.$axios.get(`/File/${filename}`, { responseType: 'blob' })
+        .then(response => {
+          console.log('res.data:',response)
+          const blob = new Blob([response], { type: 'image/jpeg' });
+          const imageUrl = URL.createObjectURL(blob);
+          this.imageUrl = imageUrl;
+          console.log("imageUrl:", this.imageUrl)
+        })
+        .catch(error => {
+          console.error('Error loading image:', error);
+        });
+    },
+    filteredItems() {
+
+      return this.userInfo.filter(item => item !== 'avatar');
+    },
+    
+    showPopup() {
+      this.props.showModule = true;
+    },
+    closePopup() {
+      this.props.showModule = false;
+    },
+    
+    iconClass(key) {
+      // 根据字段名返回相应的 FontAwesome 图标类名
+      switch (key) {
+        case 'userName':
+          return 'fa-user';
+        case 'status':
+          return 'fa-user-check';
+        case 'sex':
+          return 'fa-venus-mars';
+        case 'userType':
+          return 'fa-user-tag';
+        case 'nickName':
+          return 'fa-id-badge';
+        case 'avatar':
+          return 'fa-image';
+        case 'email':
+          return 'fa-envelope';
+        case 'phoneNumber':
+          return 'fa-phone';
+        default:
+          return 'fa-info-circle';
+      }
     }
   }
 };
 </script>
 
 <style scoped>
+.app {
+  font-family: Arial, sans-serif;
+}
+
+body {
+  overflow: hidden;
+  /* 防止页面溢出 */
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* 定义两列 */
+  grid-gap: 0px;
+  /* 设置网格间隔 */
+  margin-left: 1%;
+}
+
+.avatar-wrapper {
+  position: relative;
+  /* 使用相对定位 */
+  margin-top: 1%;
+  left: 2%;
+  width: 300px;
+  /* 设置相同的宽度和高度 */
+  height: 300px;
+  /* 设置相同的宽度和高度 */
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.avatar-wrapper:hover {
+  transform: scale(1.05);
+}
+
 .profile-container {
-  width: 95%;
-  height: 100%;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: #f8f8f8;
+
+  /* height: 100vh; 让容器铺满整个视口高度 */
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 40px;
+  /* text-align: center; */
 }
 
-.profile-form {
-  width: 95%;
-  height: 95%;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
-}
-
-.form-header {
-  text-align: center;
+.profile-header {
+  flex: 1;
+  display: flex;
+  padding-left: 0%;
   margin-bottom: 20px;
+  align-items: center;
+  /* 水平居中 */
+  justify-content: center;
+  /* 垂直居中 */
 }
 
-.form-group {
+.profile-cont {
+
+  padding: 2%;
+  margin-bottom: 1%;
+}
+
+.profile-header h1 {
+  font-size: 120px;
+  display: flex;
+  padding: 2%;
+  margin-bottom: 1%;
+}
+
+.profile-header p {
+  font-size: 16px;
+  color: #666;
+}
+
+.profile-details {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px;
+  align-items: left;
+  margin-bottom: 20px;
+  align-items: center;
+  /* 水平居中 */
+  justify-content: center;
+  /* 垂直居中 */
 }
 
-label {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.input-container {
+.detail-item {
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
+  padding: auto;
+  margin: 20px;
+  transition: transform 0.3s;
 }
 
-input {
-  width: 100%;
+.detail-item:hover {
+  transform: translateY(-5px);
+}
+
+.detail-icon {
+  width: 40px;
   height: 40px;
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
+  background-color: #007bff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
 }
 
-button {
-  width: 100%;
-  padding: 10px;
+.detail-icon i {
+  color: #fff;
+  font-size: 20px;
+  /* 设置图标大小 */
+}
+
+.detail-content p {
+  font-size: 18px;
+  transition: color 0.3s;
+}
+
+.detail-item:hover .detail-content p {
+  color: #007bff;
+}
+
+.edit-profile-btn button {
+  position: fixed;
+  bottom: 20px;
+  /* 悬浮在页面底部 */
+  right: 20px;
+  /* 添加渐变效果 */
+  z-index: 1000;
+  padding: 10px 20px;
   background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 15px;
+  transition: background-color 0.3s ease;
 }
 
-button:hover {
+.edit-profile-btn button:hover {
   background-color: #0056b3;
-}
-
-@media (max-width: 768px) {
-  .profile-form {
-    width: 90%;
-  }
 }
 </style>

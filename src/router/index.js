@@ -29,25 +29,48 @@ const router = new Router({
   {
     path: '/index',
     component: () => import("@/components/myIndex.vue"),//懒加载
+    meta: { requireAuth: true },
     children: [
       {
-      path: '/Kali_Liunx',
-      name: 'Kali_Liunx',
+      path: '/Liunx/Kali',
+      name: 'KaliLiunx',
+      meta: { requireAuth: true },
       component: () => import("@/components/myWebSSH.vue")
+    },
+    {
+      path: '/Liunx/Msf',
+      name: 'MsfLiunx',
+      meta: { requireAuth: true },
+      component: () => import("@/components/msfWebSSH.vue")
+    },
+    {
+      path: '/Liunx/Level1',
+      name: 'Level1',
+      meta: { requireAuth: true },
+      component: () => import("@/components/myCipherPage.vue")
     },
     {
       path: '/myComments',
       name: 'myComments',
+      meta: { requireAuth: true },
       component: () => import("@/components/myComments.vue")
     },
     {
       path: '/user/profile',
       name: 'user_profile',
+      meta: { requireAuth: true },
       component: () => import("@/components/myUserInfo.vue")
+    },
+    {
+      path: '/user/updateProfile',
+      name: 'updateUserInfo',
+      meta: { requireAuth: true },
+      component: () => import("@/components/updateUserInfo.vue")
     },
     {
       path: '/myBlog',
       name: 'myBlog',
+      meta: { requireAuth: true },
       component: () => import("@/components/myBlog.vue"),
       // children: [
       //   {
@@ -60,6 +83,7 @@ const router = new Router({
     {
       path: '/postPage',
       name: 'postPage',
+      meta: { requireAuth: true },
       component: () => import("@/components/myPostPage.vue")
     },
     

@@ -1,0 +1,15 @@
+import './css/scrollbar.css';
+import './css/ansi.css';
+import './css/style.css';
+import 'vue-json-viewer/style.css';
+import TerminalStore from "./common/store";
+import TerminalApi from "./common/api";
+import { configHighlight, configCodemirror, rename } from "./common/api";
+import Terminal from "./Terminal.vue";
+import { TerminalAsk, TerminalFlash } from "./types";
+export * from './types';
+export { Terminal, TerminalStore, TerminalApi, TerminalAsk, TerminalFlash, configHighlight, configCodemirror, rename };
+export default Terminal;
+export declare const api: import("./types").TerminalApi;
+export declare const Flash: typeof TerminalFlash;
+export declare const Ask: typeof TerminalAsk;

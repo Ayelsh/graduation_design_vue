@@ -1,12 +1,12 @@
 <template>
   <div class="learning-forum" :class="{ 'nav-collapsed': isNavCollapsed }">
     <el-container>
-      <el-header height="50px"><!-- 头部区 -->
+      <el-header height="7vh"><!-- 头部区 -->
         <el-row style="display: flex; align-items: center;">
           <img src="@/assets/icon-gitee.svg" alt="" height="30px" />
           <span class="brand-name">My Graduation Design</span>
           <div class="user-info" @click="toggleUserInfo">
-            <img class="avatar" src="@/assets/user-admin.jpg" alt="User Avatar" />
+            <img class="avatar" :src=imageUrl alt="User Avatar" />
             <div class="user-info-box" v-if="isUserInfoVisible">
               <router-link :to="{ name: 'user_profile' }" class="user-info-item">个人信息</router-link>
               <a href="#" class="user-info-item">设置</a>
@@ -16,7 +16,6 @@
         </el-row>
       </el-header>
       <el-container>
-
         <div class="navigation" :class="{ 'nav-collapsed': isNavCollapsed }">
           <div class="toggle-btn" @click="toggleNav">☰</div>
           <div class="nav-header">
@@ -24,6 +23,11 @@
           </div>
           <div>
             <router-link to="/myBlog" class="nav-item" :class="{ active: $route.name === 'myBlog' }">论坛</router-link>
+            <router-link to="/resources" class="nav-item"
+              :class="{ active: $route.name === 'resources' }">资源卡片</router-link>
+            <router-link to="/encode" class="nav-item" :class="{ active: $route.name === 'encode' }">密码加解密</router-link>
+            <router-link v-if="userType" :to="{ name: 'UserControl' }" class="nav-item"
+              :class="{ active: $route.name === 'UserControl' }">用户管理</router-link>
             <router-link :to="{ name: 'updateUserInfo' }" class="nav-item"
               :class="{ active: $route.name === 'updateUserInfo' }">修改我的信息</router-link>
             <router-link :to="{ name: 'KaliLiunx' }" class="nav-item"
@@ -34,16 +38,18 @@
               <div class="menu-title">Linux</div>
               <transition name="fade">
                 <div v-if="isSubMenuVisible">
-
                   <router-link class="sub-menu-item" :to="{ name: 'Level1' }">Level1：破译</router-link>
+                  <router-link class="sub-menu-item" :to="{ name: 'Level2' }">Level2：扫描</router-link>
                 </div>
               </transition>
             </div>
           </div>
         </div>
-        <div class="content">
-          <router-view></router-view>
-        </div>
+        <keep-alive>
+          <div class="content">
+            <router-view :key="$route.fullPath"></router-view>
+          </div>
+        </keep-alive>
       </el-container>
     </el-container>
   </div>
@@ -58,10 +64,34 @@ export default {
       isNavCollapsed: false,
       isUserInfoVisible: false,
       isSubMenuVisible: false,
+      imageUrl: '',
+      userType: localStorage.getItem('userType') === '管理员'
     };
+  },
+  created() {
+    this.$globalMethods.loadImageGlobal(localStorage.getItem('avatar'), this.$axios)
+      .then(imageUrl => {
+        this.imageUrl = imageUrl;
+      })
+      .catch(error => {
+        console.error('加载图片失败:', error);
+      });
+    if (localStorage.getItem('userType') === '管理员') {
+      this.$router.addRoute(
+        {
+          path: '/user/userControl',
+          name: 'UserControl',
+          meta: { requireAuth: true },
+          component: () => import("@/components/userControlPage.vue")
+        }
+      )
+    }
+
+
   },
   mounted() {
     // 导航到论坛页面
+    console.log(this.userType)
     this.$router.push({ name: 'myBlog' });
   },
   methods: {
@@ -77,7 +107,6 @@ export default {
     logout() {
       var url = "/user/logout"
       this.$axios.delete(url).then((response) => {
-        console.log(response)
         if (response.code === 200) {
           localStorage.clear();
           this.$router.push({ path: "/login" })
@@ -102,15 +131,27 @@ export default {
 
 }
 
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin 0.3s ease;
+  overflow: auto;
+  height: 93vh;
+}
+
 .learning-forum {
   display: flex;
   height: 100vh;
   transition: all 0.3s ease;
+
+
 }
 
 .el-header {
   background-color: #303030;
   color: #ffffff;
+
 }
 
 .brand-name {
@@ -152,7 +193,7 @@ export default {
   display: block;
   color: #303030;
   padding: 8px;
-  
+
   white-space: nowrap;
   text-decoration: none;
   transition: background-color 0.3s ease;
@@ -179,6 +220,7 @@ export default {
   background-color: #404040;
   color: #ffffff;
   transition: all 0.3s ease;
+
 }
 
 .nav-header {
@@ -228,12 +270,7 @@ export default {
   background-color: #505050;
 }
 
-.content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  transition: margin 0.3s ease;
-}
+
 
 .nav-collapsed .navigation {
   width: 60px;
@@ -257,5 +294,23 @@ export default {
 /* .fade-leave-active in <2.1.8 */
   {
   opacity: 0;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
 }
 </style>

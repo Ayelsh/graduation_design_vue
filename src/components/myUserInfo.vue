@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import '@fortawesome/fontawesome-free/css/all.css';
 export default {
 
 
@@ -70,7 +71,13 @@ export default {
       this.$axios.get('/user/userInfo').then((response) => {
         if (response.code === 200) {
           this.userInfo = response.data;
-          this.loadImage();
+          this.$globalMethods.loadImageGlobal(this.userInfo.avatar, this.$axios)
+            .then(imageUrl => {
+              this.imageUrl = imageUrl;
+            })
+            .catch(error => {
+              console.error('加载图片失败:', error);
+            });
         } else {
           this.props.title = "请求失败";
           this.message = response.msg;
@@ -78,34 +85,15 @@ export default {
         }
       });
     },
-    loadImage() {
-
-      const filename = this.userInfo.avatar; // 图片文件名
-      console.log("文件名：", filename)
-      this.$axios.get(`/File/${filename}`, { responseType: 'blob' })
-        .then(response => {
-          console.log('res.data:',response)
-          const blob = new Blob([response], { type: 'image/jpeg' });
-          const imageUrl = URL.createObjectURL(blob);
-          this.imageUrl = imageUrl;
-          console.log("imageUrl:", this.imageUrl)
-        })
-        .catch(error => {
-          console.error('Error loading image:', error);
-        });
-    },
     filteredItems() {
-
       return this.userInfo.filter(item => item !== 'avatar');
     },
-    
     showPopup() {
       this.props.showModule = true;
     },
     closePopup() {
       this.props.showModule = false;
     },
-    
     iconClass(key) {
       // 根据字段名返回相应的 FontAwesome 图标类名
       switch (key) {

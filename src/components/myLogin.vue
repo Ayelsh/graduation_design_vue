@@ -2,10 +2,10 @@
     <transition name="fullscreen">
 
         <div class="login">
-            <vue-particles id="particles-js" color="#fff" :particleOpacity="0.7" :particlesNumber="60" shapeType="circle"
-                :particleSize="4" linesColor="#fff" :linesWidth="1" :lineLinked="true" :lineOpacity="0.4"
-                :linesDistance="150" :moveSpeed="2" :hoverEffect="true" hoverMode="grab" :clickEffect="true"
-                clickMode="push" class="lizi">
+            <vue-particles id="particles-js" color="#fff" :particleOpacity="0.7" :particlesNumber="60"
+                shapeType="circle" :particleSize="4" linesColor="#fff" :linesWidth="1" :lineLinked="true"
+                :lineOpacity="0.4" :linesDistance="150" :moveSpeed="2" :hoverEffect="true" hoverMode="grab"
+                :clickEffect="true" clickMode="push" class="lizi">
             </vue-particles>
             <div class="mylogin">
                 <h4>登录</h4>
@@ -29,13 +29,6 @@
                         </Popup>
                     </el-form-item>
                     <div class="unlogin">
-                        <div class="container"><button class="third-party-login" >
-                                <i class="fab fa-github"></i> <!-- GitHub 图标 -->
-                                GitHub
-                            </button>
-                            
-                        </div>
-                        <br>
                         <span class="longin_register" style="position: relative;" @click="forgetPwd">忘记密码？</span>
                         <span class="longin_register" style="position: relative;" @click="register">注册账户</span>
                     </div>
@@ -52,6 +45,7 @@
 import { mapMutations } from "vuex";
 import axios from "axios";
 import Popup from "./myPopup.vue";
+import { Message } from "element-ui";
 export default {
     name: "myLogin",
     components: {
@@ -86,7 +80,7 @@ export default {
                 // 7. 设置主题色
                 themeColor: '#cc6699',
                 showModule: false,
-                
+
                 message: '请联系管理员'
 
             },
@@ -118,14 +112,35 @@ export default {
                     message: "密码不能为空！",
                 });
             }
-            console.log("用户输入的账号为：", userAccount);
-            console.log("用户输入的密码为：", userPassword);
             instance.post('/user/login', {
                 userName: userAccount,
                 password: userPassword
             }).then((response) => {
                 if (response.data.code === 200) {
                     self.$store.commit('setToken', response.data.data.token)
+                    this.$axios.get('/user/userInfo').then((response) => {
+                        if (response.code === 200) {
+                            localStorage.setItem('avatar', response.data.avatar)
+                            localStorage.setItem('userType', response.data.userType)
+                            if (response.data.userType === '管理员') {
+                                console.log(1111)
+                                console.log(response.data.userType)
+                                this.$router.addRoute(
+                                    {
+                                        path: '/user/userControl',
+                                        name: 'UserControl',
+                                        meta: { requireAuth: true },
+                                        component: () => import("@/components/userControlPage.vue")
+                                    }
+                                )
+                            }
+                        } else {
+                            Message({
+                                type: 'error',
+                                message: '用户信息请求出错'
+                            })
+                        }
+                    });
                     this.$router.push({ path: "/index" })
                 }
                 else {
@@ -138,16 +153,15 @@ export default {
                 this.props.title = "登录失败"
                 this.message = "错误：" + error
                 this.showPopup()
-                console.log(this.message)
             });
         },
         showPopup() {
-            console.log("访问show")
             this.props.showModule = true;
         },
         closePopup() {
             this.props.showModule = false;
         },
+        test() { this.$router.push({ path: "/test" }) },
         //点击忘记密码按钮
         forgetPwd() {
             //点击后路由跳转，这是编程式路由导航跳转
@@ -258,14 +272,17 @@ export default {
     background-color: #c9d4d4;
     /* Hover 时的颜色 */
 }
+
 .icon-container {
-  width: 20px; /* 设置适当的宽度 */
-  height: 20px; /* 设置适当的高度 */
+    width: 20px;
+    /* 设置适当的宽度 */
+    height: 20px;
+    /* 设置适当的高度 */
 }
 
 
 .icon {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 </style>

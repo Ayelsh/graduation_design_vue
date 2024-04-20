@@ -7,6 +7,7 @@ const state = {
     resourceTab: "fileM",//当前选中的tab资源管理
     kindCode: '', // 种别代码
     foodOptions: '', // 风味列表
+    userInfo:''
   };
   
   // getters计算属性
@@ -25,6 +26,10 @@ const state = {
       // console.log("token:"+token)
       localStorage.setItem('token', JSON.stringify(token));
       // console.log(JSON.parse(localStorage.getItem('token')))
+    },
+    setUserInfo(state,userInfo){
+      state.userInfo = userInfo;
+      console.log('userInfoX:',state.userInfo)
     },
     setIsShow (state, isShow) { // 布尔值 true
       state.isShow = isShow;

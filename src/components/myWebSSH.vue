@@ -1,17 +1,40 @@
 <template>
-  <div id="terminal" ref="terminal"></div>
+  <div>
+    <div id="terminal" ref="terminal"></div>
+    <div>
+      <buttonPanel v-on:butonClick="commndUse" ref="buttonPanel"></buttonPanel>
+    </div>
+    <div v-if="visible" class="modal">
+      <div class="modal-content">
+        <h2>{{ title }}</h2>
+        <input type="text" v-model="inputValue" @keyup.enter="handleEnterKey">
+        <div class="modal-buttons">
+          <button @click="cancel">取消</button>
+          <button @click="confirm">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
 import { Terminal } from "xterm"
 import { FitAddon } from 'xterm-addon-fit'
 import "xterm/css/xterm.css"
+import buttonPanel from "./buttonPanel.vue"
 export default {
+  components: {
+    buttonPanel
+  },
   data() {
     return {
       term: "", // 保存terminal实例
       rows: 40,
       cols: 100,
       websock: null,
+      visible: false,
+      inputValue: "",
+      commandTemp: "",
+      title: ""
     }
   },
   created() {
@@ -99,7 +122,7 @@ export default {
             shellCommand = "";
           }
           // term.prompt()
-          
+
         } else if (e.domEvent.keyCode === 8) {// back 删除的情况
           if (term._core.buffer.x > 2) {
             term.write('\b \b')
@@ -163,7 +186,88 @@ export default {
     websocketclose() {  //关闭
       this.term.write("断开连接\r")
     },
+    open() {
+      this.visible = true;
+    },
+    close() {
+      this.visible = false;
+    },
+    confirm() {
+      
+
+      this.commandTemp=this.commandTemp.replace('$$$$', this.inputValue)
+      console.log(this.inputValue)
+      let actions = {
+        "operate": "command",
+        "command": this.commandTemp + "\r",
+        "host": "127.0.0.1",
+        "port": "22",
+        "username": "test",
+        "password": "962464"
+      }
+      this.websocketsend(JSON.stringify(actions))
+      this.term.writeln("\r");
+      this.close();
+    },
+    cancel() {
+      this.term.writeln("执行取消")
+      this.close();
+    },
+    handleEnterKey() {
+      this.confirm();
+    },
+    commndUse(data) {
+      console.log("执行命令")
+      console.log(data);
+      if (!data.commandType) {
+        this.term.writeln("执行" + data.description)
+        let actions = {
+          "operate": "command",
+          "command": data.command + "\r",
+          "host": "127.0.0.1",
+          "port": "22",
+          "username": "test",
+          "password": "962464"
+        }
+
+        this.websocketsend(JSON.stringify(actions))
+        this.term.writeln("\r");
+      }
+      else {
+        this.title = data.description
+        this.term.writeln("准备执行" + data.description)
+        this.commandTemp = data.command
+        this.visible = true;
+      }
+    }
 
   }
 }
 </script>
+<style scoped>
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.modal-buttons {
+  margin-top: 10px;
+}
+
+.modal-buttons button {
+  margin-right: 10px;
+}
+</style>

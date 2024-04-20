@@ -7,20 +7,19 @@
     </div>
 
     <!-- 文章列表 -->
-    <div class="post-grid" style="overflow: auto;">
-      <div class="post" v-for="(post, index) in posts" :key="index">
-        <div class="post-thumbnail" :style="{ backgroundImage: 'url(' + post.image + ')' }"></div>
-        <div class="post-details" @click="openPostPage(post.id)">
+    <div class="post-grid">
+      <div @click="openPostPage(post.id)" class="post" v-for="(post, index) in posts" :key="index">
+        <img class="avatar-wrapper" :src=post.articleThumbnailUrl alt="帖子封面">
+        <div class="post-details">
           <div class="post-title">{{ post.articleTitle }}</div>
           <div class="post-description">{{ post.articlePreviewContent }}</div>
-          <button class="view-details-btn">View Details</button>
         </div>
       </div>
     </div>
 
     <!-- 弹出框 -->
     <Popup :title="props.title" :btn="2" :showModule="props.showModule" :size="props.size" cancelBtn="取消"
-            @cancel="closePopup" themeColor="#ff6600">
+      @cancel="closePopup" themeColor="#ff6600">
       <template slot="body">
         <div>
           <p>{{ props.message }}</p>
@@ -39,6 +38,7 @@ export default {
   data() {
     return {
       posts: [],
+      imgurl: [],
       props: {
         size: 'small',
         title: 'warning',
@@ -61,6 +61,12 @@ export default {
       this.$axios.get('/Article/initPage').then((response) => {
         if (response.code === 200) {
           this.posts = response.data;
+          for (let i = 0; i < this.posts.length; i++) {
+            this.$globalMethods.loadImageGlobal(this.posts[i].articleThumbnailUrl, this.$axios).then((res) => {
+              this.posts[i].articleThumbnailUrl = res
+          })
+            
+          }
         } else {
           this.props.title = "请求失败";
           this.props.message = response.data.data;
@@ -92,7 +98,12 @@ export default {
 .app {
   font-family: Arial, sans-serif;
 }
+.avatar-wrapper{
+  width: 300px;
+  max-height: 200px;
+  object-fit: cover;
 
+}
 /* Search bar styles */
 .search-bar {
   margin-bottom: 15px;
@@ -119,6 +130,7 @@ export default {
   border-radius: 20px;
   margin-left: 10px;
   cursor: pointer;
+  width: 100px;
   transition: background-color 0.3s ease;
 }
 
@@ -131,7 +143,10 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
-  overflow-y: auto; /* 添加这行样式 */
+  overflow-y: auto;
+  
+  
+  /* 添加这行样式 */
 }
 
 .post {
@@ -140,6 +155,9 @@ export default {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
+  border: 2px solid #333;
+  width: 300px;
+  height: 300px;
 }
 
 .post:hover {

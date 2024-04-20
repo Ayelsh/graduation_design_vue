@@ -15,11 +15,11 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.interceptors.request.use(config => {
 
     const token = localStorage.getItem('token');
-    console.log('token:',token.slice(1, token.length - 1))
+    // console.log('token:',token.slice(1, token.length - 1))
     if (token) {
         config.headers.token = token.slice(1, token.length - 1)
     }
-    console.log("请求查看："+config)
+    // console.log("请求查看："+config)
     return config;
 }, err => {
     console.log("请求拦截=>", err);
@@ -29,8 +29,8 @@ axios.interceptors.request.use(config => {
 //------------------响应拦截-------------------//
 //-------------对响应数据做点什么-------------//
 axios.interceptors.response.use(res => {
-    console.log("响应拦截=>", res.data);
-    console.log('响应头：',res.headers.authorization)
+    // console.log("响应拦截=>", res.data);
+    // console.log('响应头：',res.headers.authorization)
     //例：后端数据处理错误，并返回错误原因；前端获取错误原因并展示
     if(res.headers.authorization){
 
@@ -51,7 +51,7 @@ axios.interceptors.response.use(res => {
         router.push("/login")
     
     }
-    console.log(res);
+    // console.log(res);
     return res ? res.data : res;
 }, err => {
     console.log(err);

@@ -15,26 +15,22 @@ import vuex from 'vuex';
 import store from './store/store.js';
 //粒子动画
 import VueParticles from 'vue-particles'
-//图片库
-import '@fortawesome/fontawesome-free/css/all.css'
-//轮播图组件
-import 'vant/lib/index.css';
-// import instance from './http'
- 
-// Vue.prototype.$axios = instance
+//全局方法
+import globalMethods from './utils/globalMethods';
 
 
 Vue.prototype.$axios = axios;
+Vue.prototype.$globalMethods = globalMethods;
 Vue.use(ElementUI);
 Vue.use(vuex);
 Vue.use(VueParticles);
 
 router.beforeEach((to, from, next) => {
-  
+
   const isAuthenticated = localStorage.getItem('token');/* 判断用户是否已登录，例如从后端获取用户信息判断 */
   if (to.meta.requireAuth && !isAuthenticated) {
     // 如果需要登录但用户未登录，则跳转到登录页面
-    next('/login');
+    next('/');
   } else {
     // 如果不需要登录或用户已登录，则允许路由跳转
     next();

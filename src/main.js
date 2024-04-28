@@ -17,10 +17,24 @@ import store from './store/store.js';
 import VueParticles from 'vue-particles'
 //全局方法
 import globalMethods from './utils/globalMethods';
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+import hljs from 'highlight.js' 
+//导入代码高亮文件
+import 'highlight.js/styles/googlecode.css'; 
 
+Vue.directive('highlight',function (el) {
+  let highlight = el.querySelectorAll('code,pre');
+  highlight.forEach((block)=>{
+      if(block){
+          hljs.highlightBlock(block);
+      }
+  })
+})
 
 Vue.prototype.$axios = axios;
 Vue.prototype.$globalMethods = globalMethods;
+Vue.use(mavonEditor)
 Vue.use(ElementUI);
 Vue.use(vuex);
 Vue.use(VueParticles);

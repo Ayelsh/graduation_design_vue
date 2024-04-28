@@ -6,8 +6,9 @@ import { Message } from 'element-ui'
 
 //配置基础url、超时时间、post请求头
 
+// axios.defaults.baseURL = 'http://192.168.44.129:8989';
 axios.defaults.baseURL = 'http://127.0.0.1:80';
-axios.defaults.timeout = 5000;
+axios.defaults.timeout = 500000;
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 //------------------请求拦截-------------------//

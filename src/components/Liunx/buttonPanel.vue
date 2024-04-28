@@ -9,7 +9,7 @@
         </div>
 
         <button v-if="!visible" class="floating-menu" @click="openPanel">打开Command面板</button>
-        <button  class="floating-menu2" @click="userChange">切换Root用户</button>
+        
 
     </div>
 </template>

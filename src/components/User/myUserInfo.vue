@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="profile-header">
-      <img class="avatar-wrapper" :src=imageUrl alt="用户头像">
+      <img class="avatar-wrapper" :src=userInfo.avatar alt="用户头像">
     </div>
 
 
@@ -71,13 +71,13 @@ export default {
       this.$axios.get('/user/userInfo').then((response) => {
         if (response.code === 200) {
           this.userInfo = response.data;
-          this.$globalMethods.loadImageGlobal(this.userInfo.avatar, this.$axios)
-            .then(imageUrl => {
-              this.imageUrl = imageUrl;
-            })
-            .catch(error => {
-              console.error('加载图片失败:', error);
-            });
+          // this.$globalMethods.loadImageGlobal(this.userInfo.avatar, this.$axios)
+          //   .then(imageUrl => {
+          //     this.imageUrl = imageUrl;
+          //   })
+          //   .catch(error => {
+          //     console.error('加载图片失败:', error);
+          //   });
         } else {
           this.props.title = "请求失败";
           this.message = response.msg;

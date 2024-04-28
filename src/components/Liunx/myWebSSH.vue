@@ -141,7 +141,9 @@ export default {
       })
     },
     initWebSocket() { //初始化weosocket
+      //127.0.0.1:80
       const wsuri = "ws://127.0.0.1:80/webssh";
+      // const wsuri = "ws://192.168.44.129:8989/webssh";
       const token = localStorage.getItem('token');
       const socket = new WebSocket(wsuri, [token.slice(8, token.length - 1)]);
       socket.binaryType = 'arraybuffer';

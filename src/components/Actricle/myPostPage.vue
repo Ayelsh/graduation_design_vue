@@ -3,7 +3,8 @@
         <div class="blog-post">
             <h1 class="post-title">{{ post.articleTitle }}</h1>
             <p class="author">作者：{{ post.author }}</p>
-            <div class="post-content" v-html="compiledMarkdown"></div>
+            <mavon-editor class="markdown-body" codeStyle="monokai"  v-html="compiledMarkdown"  ref="md"/>
+            <!-- <div class="post-content" v-html="compiledMarkdown"></div> -->
         </div>
         <div class="CommentSection">
             <CommentSection :comments="commentsData" :key="componentKey" v-on:commentPosted="openComment"
@@ -50,14 +51,15 @@ export default {
         this.initComments();
     },
     methods: {
-        initPageData() {
+        async initPageData() {
             var url = "/Article/initPostPage/" + this.$route.query.id
             console.log(url)
-            this.$axios.get(url).then((response) => {
+            await this.$axios.get(url).then((response) => {
                 if (response.code === 200) {
                     console.log("请求成功")
                     this.post = response.data
                     this.compiledMarkdown = marked(decodeURIComponent(this.post.articleContent));
+                    // this.compiledMarkdown = marked(this.post.articleContent);
                 }
                 else {
                     console.log("请求失败")
@@ -132,18 +134,6 @@ export default {
             this.$axios.get(url).then((res) => {
                 if (res.code === 200) {
                     this.commentsData = res.data
-                    for (let i = 0; i < this.commentsData.length; i++) {
-                        this.$globalMethods.loadImageGlobal(this.commentsData[i].authorAvatar, this.$axios).then((res) => {
-                            this.commentsData[i].authorAvatar = res
-                        })
-                        for (let j = 0; j < this.commentsData[i].children.length; j++) {
-                            this.$globalMethods.loadImageGlobal(this.commentsData[i].children[j].authorAvatar, this.$axios).then((res) => {
-                                this.commentsData[i].children[j].authorAvatar = res
-                            })
-                        }
-                    }
-                    // console.log(this.commentsData);
-                    console.log("fuzujianhuoqu")
 
                 }
                 else {

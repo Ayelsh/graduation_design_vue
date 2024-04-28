@@ -5,11 +5,13 @@
         <el-row style="display: flex; align-items: center;">
           <img src="@/assets/icon-gitee.svg" alt="" height="30px" />
           <span class="brand-name">My Graduation Design</span>
-          <div class="user-info" @click="toggleUserInfo">
-            <img class="avatar" :src=imageUrl alt="User Avatar" />
+          <div class="user-info">
+            <img class="avatar" :src=imageUrl alt="User Avatar" @click="toggleUserInfo" />
             <div class="user-info-box" v-if="isUserInfoVisible">
               <router-link :to="{ name: 'user_profile' }" class="user-info-item">个人信息</router-link>
-              <a href="#" class="user-info-item">设置</a>
+              <router-link v-if="userType" :to="{ name: 'UserControl' }" class="user-info-item">用户管理</router-link>
+              <router-link v-if="userType" :to="{ name: 'postControlPage' }" class="user-info-item">帖子管理</router-link>
+              <router-link v-if="userType" :to="{ name: 'resourceControlPage' }" class="user-info-item">资源管理</router-link>
               <a class="user-info-item" @click="logout">退出登录</a>
             </div>
           </div>
@@ -24,30 +26,19 @@
           <div>
             <router-link to="/myBlog" class="nav-item" :class="{ active: $route.name === 'myBlog' }">论坛</router-link>
             <router-link to="/resources" class="nav-item"
-              :class="{ active: $route.name === 'resources' }">资源卡片</router-link>
+              :class="{ active: $route.name === 'resources' }">资源中心</router-link>
             <router-link to="/encode" class="nav-item" :class="{ active: $route.name === 'encode' }">密码加解密</router-link>
-            <router-link v-if="userType" :to="{ name: 'UserControl' }" class="nav-item"
-              :class="{ active: $route.name === 'UserControl' }">用户管理</router-link>
             <router-link :to="{ name: 'updateUserInfo' }" class="nav-item"
               :class="{ active: $route.name === 'updateUserInfo' }">修改我的信息</router-link>
             <router-link :to="{ name: 'KaliLiunx' }" class="nav-item"
               :class="{ active: $route.name === 'KaliLiunx' }">Kali攻击机</router-link>
             <router-link :to="{ name: 'MsfLiunx' }" class="nav-item"
               :class="{ active: $route.name === 'MsfLiunx' }">MSF靶机</router-link>
-            <div class="sub-menu" @click="toggleSubMenu">
-              <div class="menu-title">Linux</div>
-              <transition name="fade">
-                <div v-if="isSubMenuVisible">
-                  <router-link class="sub-menu-item" :to="{ name: 'Level1' }">Level1：破译</router-link>
-                  <router-link class="sub-menu-item" :to="{ name: 'Level2' }">Level2：扫描</router-link>
-                </div>
-              </transition>
-            </div>
           </div>
         </div>
         <keep-alive>
           <div class="content">
-            <router-view :key="$route.fullPath"></router-view>
+            <router-view></router-view>
           </div>
         </keep-alive>
       </el-container>
@@ -64,25 +55,39 @@ export default {
       isNavCollapsed: false,
       isUserInfoVisible: false,
       isSubMenuVisible: false,
-      imageUrl: '',
-      userType: localStorage.getItem('userType') === '管理员'
+      imageUrl: localStorage.getItem('avatar'),
+      userType: localStorage.getItem('userType') === '管理员' ? true : false
     };
   },
   created() {
-    this.$globalMethods.loadImageGlobal(localStorage.getItem('avatar'), this.$axios)
-      .then(imageUrl => {
-        this.imageUrl = imageUrl;
-      })
-      .catch(error => {
-        console.error('加载图片失败:', error);
-      });
+    this.imageUrl = localStorage.getItem('avatar')
+    console.log(this.imageUrl)
     if (localStorage.getItem('userType') === '管理员') {
       this.$router.addRoute(
         {
-          path: '/user/userControl',
-          name: 'UserControl',
+          path: '/index',
+          component: () => import("@/components/myIndex.vue"),//懒加载
           meta: { requireAuth: true },
-          component: () => import("@/components/userControlPage.vue")
+          children: [
+            {
+              path: '/user/userControl',
+              name: 'UserControl',
+              meta: { requireAuth: true },
+              component: () => import("@/components/User/userControlPage.vue")
+            },
+            {
+              path: '/postControlPage',
+              name: 'postControlPage',
+              meta: { requireAuth: true },
+              component: () => import("@/components/Actricle/ActricleControl.vue")
+            },
+            {
+              path: '/resourceControlPage',
+              name: 'resourceControlPage',
+              meta: { requireAuth: true },
+              component: () => import("@/components/Anthor/resourceControl.vue")
+            },
+          ]
         }
       )
     }
@@ -92,6 +97,7 @@ export default {
   mounted() {
     // 导航到论坛页面
     console.log(this.userType)
+    this.imageUrl = localStorage.getItem('avatar')
     this.$router.push({ name: 'myBlog' });
   },
   methods: {
@@ -138,6 +144,7 @@ export default {
   transition: margin 0.3s ease;
   overflow: auto;
   height: 93vh;
+  /* overflow-x: hidden; */
 }
 
 .learning-forum {
@@ -167,6 +174,7 @@ export default {
 }
 
 .avatar {
+  margin-top: 5px;
   width: 40px;
   height: 40px;
   border-radius: 50%;

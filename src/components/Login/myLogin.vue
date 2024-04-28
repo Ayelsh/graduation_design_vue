@@ -19,14 +19,6 @@
                     </el-form-item>
                     <el-form-item style="margin-top: 40px">
                         <el-button type="primary" round class="submitBtn" @click="submitForm">登录</el-button>
-                        <Popup :title="props.title" :btn="2" :showModule="props.showModule" :size="props.size"
-                            cancelBtn="取消" @cancel="closePopup" themeColor="#ff6600">
-                            <template slot="body">
-                                <div>
-                                    <p>{{ message }}</p>
-                                </div>
-                            </template>
-                        </Popup>
                     </el-form-item>
                     <div class="unlogin">
                         <span class="longin_register" style="position: relative;" @click="forgetPwd">忘记密码？</span>
@@ -42,18 +34,15 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
-import axios from "axios";
-import Popup from "./myPopup.vue";
 import { Message } from "element-ui";
+import axios from "axios";
 export default {
     name: "myLogin",
-    components: {
-        Popup
-
-    },
     data: function () {
         return {
+            instance: axios.create({
+                baseURL: 'http://127.0.0.1:80',
+            }),
             message: "",
             loginForm: {
                 account: "",
@@ -63,42 +52,19 @@ export default {
                 account: [{ required: true, message: "请输入账号", trigger: "blur" }],
                 passWord: [{ required: true, message: "请输入密码", trigger: "blur" }],
             },
-            props: {
-                // 1. 弹框大小：包括 小 small 中 middle 大 large 表单 form
-                size: 'small',
-                // 2. 弹框标题
-                title: 'warning',
-                // 3. 按钮类型： 1 确定 2 取消 3 确定&取消
-                btn: 3,
-                // 4. 按钮内容
-                submitBtn: 'submit',
-                cancelBtn: 'cancel',
-                // 5. 是否显示遮罩层
-                mask: true,
-                // 6. 选择弹框显示/隐藏的动画效果：top 从上方渐入渐出 fade 淡入淡出
-                transition: 'top',
-                // 7. 设置主题色
-                themeColor: '#cc6699',
-                showModule: false,
 
-                message: '请联系管理员'
-
-            },
 
         };
     },
 
     methods: {
-        ...mapMutations(["changeLogin"]),
-        submitForm() {
 
+        async submitForm() {
+
+            // 1653997504@qq.com
             const self = this;
             const userAccount = this.loginForm.account;
             const userPassword = this.loginForm.passWord;
-            const instance = axios.create({
-                baseURL: 'http://127.0.0.1:80',
-            });
-
 
             if (!userAccount) {
                 return this.$message({
@@ -112,47 +78,42 @@ export default {
                     message: "密码不能为空！",
                 });
             }
-            instance.post('/user/login', {
+            await this.instance.post('/user/login', {
                 userName: userAccount,
                 password: userPassword
-            }).then((response) => {
-                if (response.data.code === 200) {
-                    self.$store.commit('setToken', response.data.data.token)
+            }).then((res) => {
+                if (res.data.code === 200) {
+                    
+                    self.$store.commit('setToken', res.data.data.token)
                     this.$axios.get('/user/userInfo').then((response) => {
+                        console.log(response);
                         if (response.code === 200) {
                             localStorage.setItem('avatar', response.data.avatar)
                             localStorage.setItem('userType', response.data.userType)
-                            if (response.data.userType === '管理员') {
-                                console.log(1111)
-                                console.log(response.data.userType)
-                                this.$router.addRoute(
-                                    {
-                                        path: '/user/userControl',
-                                        name: 'UserControl',
-                                        meta: { requireAuth: true },
-                                        component: () => import("@/components/userControlPage.vue")
-                                    }
-                                )
-                            }
+                            this.$router.push({ path: "/index" })
                         } else {
                             Message({
                                 type: 'error',
-                                message: '用户信息请求出错'
+                                message: '用户信息请求出错'+response.data
                             })
                         }
                     });
-                    this.$router.push({ path: "/index" })
+                    
                 }
                 else {
-                    this.props.title = "登录失败"
-                    this.message = response.data.data
-                    this.showPopup()
+                    console.log("请求失败");
+                    console.log(res);
+                    Message({
+                        type: 'error',
+                        message: res.data.msg + '\n' + res.data.data
+                    })
                 }
             }).catch((error) => {
                 console.log("请求失败" + error);
-                this.props.title = "登录失败"
-                this.message = "错误：" + error
-                this.showPopup()
+                Message({
+                    type: 'error',
+                    message: error
+                })
             });
         },
         showPopup() {

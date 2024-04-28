@@ -76,7 +76,7 @@
   height: calc(100% - var(--#{$prefix}modal-margin) * 2);
 
   .modal-content {
-    max-height: 100%;
+    
     overflow: hidden;
   }
 

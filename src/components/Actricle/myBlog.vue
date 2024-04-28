@@ -17,7 +17,7 @@
 
 <script>
 // import CategoryPanel from '@/components/CategoryPanel.vue';
-import PostGrid from '@/components/PostGrid.vue';
+import PostGrid from '@/components/Actricle/PostGrid.vue';
 
 export default {
     components: {

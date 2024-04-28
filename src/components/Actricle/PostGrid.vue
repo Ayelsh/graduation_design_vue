@@ -17,70 +17,72 @@
       </div>
     </div>
 
-    <!-- 弹出框 -->
-    <Popup :title="props.title" :btn="2" :showModule="props.showModule" :size="props.size" cancelBtn="取消"
-      @cancel="closePopup" themeColor="#ff6600">
-      <template slot="body">
-        <div>
-          <p>{{ props.message }}</p>
-        </div>
-      </template>
-    </Popup>
+    <div style="display:inline-block;">
+      <el-pagination style="padding-top: 15px" @size-change="findSizeChange" @current-change="initPost"
+        :current-page.sync="page" :page-sizes="[2, 4, 6, 8, 10]" :page-size="size"
+        layout="total, sizes, prev, pager, next, jumper" :total="total">
+      </el-pagination>
+    </div>
+    
   </div>
 </template>
 
 <script>
-import Popup from "./myPopup.vue";
+import { Message } from 'element-ui';
+
+
 export default {
-  components: {
-    Popup
-  },
+  
   data() {
     return {
       posts: [],
       imgurl: [],
-      props: {
-        size: 'small',
-        title: 'warning',
-        btn: 3,
-        submitBtn: 'submit',
-        cancelBtn: 'cancel',
-        mask: true,
-        transition: 'top',
-        themeColor: '#cc6699',
-        showModule: false,
-        message: '请联系管理员'
-      }
+      page: 0,
+      size: 10,
+      total : 0,
+      totalPage:100
     };
   },
   created() {
     this.initPost();
   },
   methods: {
+    findSizeChange(size) {
+        console.log("当每页条数改变的时候" + size);
+        //将val赋值给size
+        this.size = size;
+        //重新去后台查询数据
+        this.initPost()
+      },
     initPost() {
-      this.$axios.get('/Article/initPage').then((response) => {
-        if (response.code === 200) {
-          this.posts = response.data;
-          for (let i = 0; i < this.posts.length; i++) {
-            this.$globalMethods.loadImageGlobal(this.posts[i].articleThumbnailUrl, this.$axios).then((res) => {
-              this.posts[i].articleThumbnailUrl = res
-          })
-            
-          }
-        } else {
-          this.props.title = "请求失败";
-          this.props.message = response.data.data;
-          this.showPopup();
+      if(this.page > this.totalPage){
+        Message({
+          type:'error',
+          message:'请求页数超出总页数'
+        })
+      }else{
+      this.$axios.get('/Article/initPagePage', {
+        params: {
+          pageNumber: this.page,
+          pageSize: this.size
         }
-      });
-    },
-    showPopup() {
-      this.props.showModule = true;
-    },
-    closePopup() {
-      this.props.showModule = false;
+      }).then((response) => {
+        if (response.code === 200) {
+          this.posts = response.data.records;
+          this.total = response.data.total
+          this.totalPage = response.data.pages
+          
+        } else {
+          console.log(response.msg+response.data)
+          Message({
+            type:'error',
+            message:response.msg+response.data
+          })
+        }
+      });}
     },
     openPostPage(postid) {
+      console.log(postid)
       this.$router.push({
         path: '/postPage',
         query: { id: postid }
@@ -98,12 +100,14 @@ export default {
 .app {
   font-family: Arial, sans-serif;
 }
-.avatar-wrapper{
+
+.avatar-wrapper {
   width: 300px;
   max-height: 200px;
   object-fit: cover;
 
 }
+
 /* Search bar styles */
 .search-bar {
   margin-bottom: 15px;
@@ -144,8 +148,8 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
   overflow-y: auto;
-  
-  
+
+
   /* 添加这行样式 */
 }
 
@@ -209,3 +213,4 @@ export default {
 
 /* Your existing Popup styles */
 </style>
+

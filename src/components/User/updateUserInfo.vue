@@ -76,6 +76,7 @@
           console.log(response)
           var messageType = ''
           if (response.code === 200) {
+            localStorage.setItem('avatar', this.userInfo.avatar)
             messageType = 'success'
           } else {
             messageType = 'warning'
@@ -101,7 +102,7 @@
         avatarData.append('file', file);
   
         try {
-          const response = await this.$axios.post('/File/uploadAvatar', avatarData,
+          const response = await this.$axios.post('/File/uploadAvatarMinio', avatarData,
             {
               headers: {
                 'Content-Type': 'multipart/form-data'
@@ -114,6 +115,7 @@
               message: '上传成功'
             })
             this.userInfo.avatar = response.data
+            console.log(this.userInfo.avatar)
           }
         } catch (error) {
           Message({

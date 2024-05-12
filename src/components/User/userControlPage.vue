@@ -26,18 +26,18 @@
         <h2>{{ editingUser ? '编辑用户' : '添加用户' }}</h2>
 
         <form @submit.prevent="saveUser" class="user-form">
-          <input type="text" v-model="form.userName" placeholder="用户名" required class="form-input" />
+          <input v-if="!editingUser" type="text" v-model="form.userName" placeholder="用户名" required class="form-input" />
           <input type="text" v-model="form.nickName" placeholder="昵称" required class="form-input" />
           <input type="password" v-model="form.password" placeholder="密码(为空表示不修改/默认密码)"  class="form-input" />
           <input type="email" v-model="form.email" placeholder="邮箱" required class="form-input" />
           <input type="text" v-model="form.phoneNumber" placeholder="手机号" required class="form-input" />
-          <select v-model="form.status" required class="form-select">
+          <!-- <select v-model="form.status" required class="form-select">
             <option value="0">正常</option>
             <option value="1">停用</option>
-          </select>
+          </select> -->
           <select v-model="form.sex" required class="form-select">
-            <option value="0">男</option>
-            <option value="1">女</option>
+            <option value="1">男</option>
+            <option value="0">女</option>
             <option value="2">未知</option>
           </select>
           <div class="form-group avatar-group">
@@ -106,6 +106,7 @@ export default {
     },
     editUser(user) {
       this.editingUser = user;
+      console.log(user)
       this.form.id = user.id;
       this.form.userName = user.userName;
       this.form.nickName = user.nickName;
@@ -119,16 +120,18 @@ export default {
     saveUser() {
       if (this.editingUser) {
         //编辑
-        const index = this.users.findIndex(user => user.id === this.form.id);
+        const index = this.users.findIndex(user => user.userName === this.form.userName);
         if (index !== -1) {
           this.form.status = parseInt(this.form.status)
           this.form.sex = parseInt(this.form.sex)
           this.$axios.post('/user/userUpdate', this.form).then((res) => {
             if (res.code === 200) {
-              this.$message.success('用户修改成功');
               
+              this.$message.success('用户修改成功'+index);
               this.users[index] = { ...this.form };
+              this.initUserList()
               this.closeModal();
+
             } else {
               this.$message.error(res.msg);
             }
@@ -143,7 +146,7 @@ export default {
               this.$message.success('用户添加成功');
               this.showModal =false
             } else {
-              this.$message.error(res.msg);
+              this.$message.error(res.msg+'\n'+res.data);
               this.closeModal();
             }
           }).catch(err => {
@@ -170,27 +173,55 @@ export default {
           })}
       })
     },
-    handleAvatarUpload(event) {
-      const file = event.target.files[0];
-      const avatarData = new FormData();
-      avatarData.append('file', file);
-
-      try {
-        const response = this.$axios.post('/File/uploadAvatar', avatarData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data'
+    async handleAvatarUpload(event) {
+        const file = event.target.files[0];
+        const avatarData = new FormData();
+        avatarData.append('file', file);
+  
+        try {
+          const response = await this.$axios.post('/File/uploadAvatarMinio', avatarData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
             }
+          );
+          if (response.code === 200) {
+            Message({
+              type: 'success',
+              message: '上传成功'
+            })
+            this.form.avatar = response.data
+            
           }
-        );
-        if (response.code === 200) {
-          this.$message.success('上传成功');
-          this.form.avatar = response.data;
+        } catch (error) {
+          Message({
+            type: 'warning',
+            message: '上传失败:' + error
+          })
         }
-      } catch (error) {
-        this.$message.warning('上传失败:' + error);
-      }
-    },
+      },
+    // handleAvatarUpload(event) {
+    //   const file = event.target.files[0];
+    //   const avatarData = new FormData();
+    //   avatarData.append('file', file);
+
+    //   try {
+    //     const response = this.$axios.post('/File/uploadAvatar', avatarData,
+    //       {
+    //         headers: {
+    //           'Content-Type': 'multipart/form-data'
+    //         }
+    //       }
+    //     );
+    //     if (response.code === 200) {
+    //       this.$message.success('上传成功');
+    //       this.form.avatar = response.data;
+    //     }
+    //   } catch (error) {
+    //     this.$message.warning('上传失败:' + error);
+    //   }
+    // },
     closeModal() {
       this.editingUser = null;
       this.form.id = null;

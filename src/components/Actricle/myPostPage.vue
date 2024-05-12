@@ -58,8 +58,9 @@ export default {
                 if (response.code === 200) {
                     console.log("请求成功")
                     this.post = response.data
-                    this.compiledMarkdown = marked(decodeURIComponent(this.post.articleContent));
-                    // this.compiledMarkdown = marked(this.post.articleContent);
+                    // this.compiledMarkdown = marked(decodeURIComponent(this.post.articleContent));
+                    this.compiledMarkdown = marked(this.post.articleContent.replaceAll('data-original','src'));
+                    
                 }
                 else {
                     console.log("请求失败")
@@ -129,9 +130,9 @@ export default {
             this.commentsData = commentsData
 
         },
-        initComments() {
+        async initComments() {
             var url = '/Comments/' + this.$route.query.id
-            this.$axios.get(url).then((res) => {
+            await this.$axios.get(url).then((res) => {
                 if (res.code === 200) {
                     this.commentsData = res.data
 
@@ -150,16 +151,6 @@ export default {
             this.$axios.get(url).then((res) => {
                 if (res.code === 200) {
                     this.commentsData = res.data
-                    for (let i = 0; i < this.commentsData.length; i++) {
-                        this.$globalMethods.loadImageGlobal(this.commentsData[i].authorAvatar, this.$axios).then((res) => {
-                            this.commentsData[i].authorAvatar = res
-                        })
-                        for (let j = 0; j < this.commentsData[i].children.length; j++) {
-                            this.$globalMethods.loadImageGlobal(this.commentsData[i].children[j].authorAvatar, this.$axios).then((res) => {
-                                this.commentsData[i].children[j].authorAvatar = res
-                            })
-                        }
-                    }
                 }
                 else {
                     Message({

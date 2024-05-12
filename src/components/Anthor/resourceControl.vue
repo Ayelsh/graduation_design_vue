@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="grid-container">
-            <div v-for="(card, index) in cards" :key="index" :style="{ backgroundColor: getRandomColor() }" class="card"
+            <div  v-for="(card, index) in cards" :key="index" :style="{ backgroundColor: getRandomColor() }" class="card"
                 @click="showCard(card)">
                 <h1>{{ card.filename }}</h1>
             <button class="close" @click="deleteCard(card.id)">删除</button>
@@ -48,6 +48,7 @@ export default {
       fileList: [],
       loadProgress: 0, // 动态显示进度条
       progressFlag: false, // 关闭进度条
+      key:0
     };
   },
   created() {
@@ -55,12 +56,7 @@ export default {
   },
   methods: {
     initCard() {
-      if (this.page > this.totalPage) {
-        Message({
-          type: 'error',
-          message: 'Requested page exceeds total pages'
-        })
-      } else {
+      
         console.log(this.page)
         this.$axios.get('/File/list', {
           params: {
@@ -75,8 +71,7 @@ export default {
             Message.error(res.msg + '\n' + res.data);
           }
         })
-      }
-    },
+      },
     showCard(card) {
       this.selectedCard = card;
       this.showModal = true;
@@ -88,8 +83,12 @@ export default {
       const randomIndex = Math.floor(Math.random() * this.monetColors.length);
       return this.monetColors[randomIndex];
     },
-    deleteCard(id){
-        var url = '' +id
+    findSizeChange(size) {
+      this.size = size;
+      this.initCard();
+    },
+    async deleteCard(id){
+        var url = '/File/resources/' +id
         this.$axios.delete(url).then(res =>{
         if(res.code === 200){
           Message({
@@ -102,8 +101,11 @@ export default {
             type:'error',
             message:'删除资源失败\n'+res.data
           })
+          this.initCard();
         }
+        
       })
+      
     }
   },
 };
@@ -127,9 +129,105 @@ export default {
   color: #fff;
   border: none;
   border-radius: 20px;
-  left: 50px;
+  right: 50px;
   bottom: 5%;
   position: absolute;
   width: 100px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  
+  color: #fff;
+  top: 10px;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  border: 2px solid #333;
+  width: 200px;
+  height: 100px;
+  cursor: pointer;
+  left: 20px;
+  padding: 20px;
+  border-radius: 8px;
+
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.modal-content {
+  max-width: 400px;
+  background-color: white;
+  min-width: 300px;
+  min-height: 100px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+  margin-bottom: 10px;
+}
+
+.modal-content p {
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.el-pagination {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.toggle-button {
+  position: fixed;
+  bottom: 60px;
+  /* 悬浮在页面底部 */
+  right: 20px;
+  /* 悬浮在页面右边缘 */
+  padding: 10px 20px;
+  background-color: #4caf50;
+  /* 绿色背景色 */
+  color: #fff;
+  /* 白色文字颜色 */
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  /* 添加渐变效果 */
+  z-index: 1000;
 }
 </style>

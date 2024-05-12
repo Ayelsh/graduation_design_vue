@@ -26,7 +26,6 @@
   
   <script>
   import { Message } from 'element-ui';
-  
   export default {
     data() {
       return {
@@ -58,12 +57,12 @@
           }
         });
       },
-      submitForm() {
-        // 这里可以添加表单验证逻辑
+      async submitForm() {
+        
         let that = this
         const url = '/user/userInfo'
   
-        this.$axios.post(url, {
+        await this.$axios.post(url, {
           userName: this.userInfo.userName,
           nickName: this.userInfo.nickName,
           status: this.userInfo.status,
@@ -77,6 +76,8 @@
           var messageType = ''
           if (response.code === 200) {
             localStorage.setItem('avatar', this.userInfo.avatar)
+            console.log(localStorage.getItem('avatar'))
+            console.log(localStorage.getItem('userType'))
             messageType = 'success'
           } else {
             messageType = 'warning'
@@ -87,6 +88,8 @@
             type: messageType,
             duration: 2000
           })
+        
+          this.$parent.$parent.$parent.updateAvatar()
           that.$router.push({ path: "/user/profile" })
         }).catch((error) => {
           that.$message({

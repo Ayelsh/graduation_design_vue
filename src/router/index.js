@@ -22,6 +22,10 @@ const router = new Router({
     component: () => import("@/components/Login/myLogin.vue")
   },
   {
+    path: '/forget',
+    component: () => import("@/components/Login/myForget.vue")
+  },
+  {
     path: '/register',
     component: () => import("@/components/Login/myRegister.vue"),
   },
@@ -55,6 +59,12 @@ const router = new Router({
         name: 'resources',
         meta: { requireAuth: true },
         component: () => import("@/components/Anthor/resourcesCard.vue")
+      },
+      {
+        path: '/resourceControlPage',
+        name: 'resourceControlPage',
+        meta: { requireAuth: true },
+        component: () => import("@/components/Anthor/resourceControl.vue")
       },
       {
         path: '/user/profile',

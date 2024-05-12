@@ -126,7 +126,7 @@ export default {
         //点击忘记密码按钮
         forgetPwd() {
             //点击后路由跳转，这是编程式路由导航跳转
-            this.$router.push({ path: "/" })
+            this.$router.push({ path: "/forget" })
         },
         //点击注册按钮
         register() {

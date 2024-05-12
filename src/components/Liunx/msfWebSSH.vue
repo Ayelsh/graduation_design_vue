@@ -1,5 +1,8 @@
 <template>
-    <div id="terminal" ref="terminal"></div>
+    <div class="windows">
+        <div id="terminal" ref="terminal"></div>
+    </div>
+
 </template>
 <script>
 import { Terminal } from "xterm"
@@ -167,3 +170,9 @@ export default {
     }
 }
 </script>
+<style>
+.windows{
+    height: 100%;
+    max-height: 100vh;
+}
+</style>

@@ -107,7 +107,7 @@ export default {
 }
 .toggle-button {
     position: fixed;
-    bottom: 60px;
+    bottom: 50px;
     /* 悬浮在页面底部 */
     right: 20px;
     /* 悬浮在页面右边缘 */

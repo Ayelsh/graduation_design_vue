@@ -6,12 +6,13 @@
           <img src="@/assets/icon-gitee.svg" alt="" height="30px" />
           <span class="brand-name">My Graduation Design</span>
           <div class="user-info">
-            <img class="avatar" :src=imageUrl alt="User Avatar" @click="toggleUserInfo" />
+            <img :key="key" class="avatar" :src=imageUrl alt="User Avatar" @click="toggleUserInfo" />
             <div class="user-info-box" v-if="isUserInfoVisible">
-              <router-link :to="{ name: 'user_profile' }" class="user-info-item">个人信息</router-link>
+              <router-link :to="{ name: 'updateUserInfo' }" class="user-info-item">修改我的信息</router-link>
               <router-link v-if="userType" :to="{ name: 'UserControl' }" class="user-info-item">用户管理</router-link>
               <router-link v-if="userType" :to="{ name: 'postControlPage' }" class="user-info-item">帖子管理</router-link>
-              <router-link v-if="userType" :to="{ name: 'resourceControlPage' }" class="user-info-item">资源管理</router-link>
+              <router-link v-if="userType" :to="{ name: 'resourceControlPage' }"
+                class="user-info-item">资源管理</router-link>
               <a class="user-info-item" @click="logout">退出登录</a>
             </div>
           </div>
@@ -28,8 +29,8 @@
             <router-link to="/resources" class="nav-item"
               :class="{ active: $route.name === 'resources' }">资源中心</router-link>
             <router-link to="/encode" class="nav-item" :class="{ active: $route.name === 'encode' }">密码加解密</router-link>
-            <router-link :to="{ name: 'updateUserInfo' }" class="nav-item"
-              :class="{ active: $route.name === 'updateUserInfo' }">修改我的信息</router-link>
+            <router-link :to="{ name: 'user_profile' }" class="nav-item"
+              :class="{ active: $route.name === 'user_profile' }">我的信息</router-link>
             <router-link :to="{ name: 'KaliLiunx' }" class="nav-item"
               :class="{ active: $route.name === 'KaliLiunx' }">Kali攻击机</router-link>
             <router-link :to="{ name: 'MsfLiunx' }" class="nav-item"
@@ -56,10 +57,24 @@ export default {
       isUserInfoVisible: false,
       isSubMenuVisible: false,
       imageUrl: localStorage.getItem('avatar'),
-      userType: localStorage.getItem('userType') === '管理员' ? true : false
+      userType: localStorage.getItem('userType') === '管理员' ? true : false,
+      key:0,
     };
   },
   created() {
+    this.$axios.get('/user/userInfo').then((response) => {
+      console.log(response);
+      if (response.code === 200) {
+        localStorage.setItem('avatar', response.data.avatar)
+        localStorage.setItem('userType', response.data.userType)
+        this.imageUrl=localStorage.getItem('avatar')
+      } else {
+        Message({
+          type: 'error',
+          message: '用户信息请求出错' + response.data
+        })
+      }
+    });
     this.imageUrl = localStorage.getItem('avatar')
     console.log(this.imageUrl)
     if (localStorage.getItem('userType') === '管理员') {
@@ -101,6 +116,10 @@ export default {
     this.$router.push({ name: 'myBlog' });
   },
   methods: {
+    updateAvatar(){
+      this.imageUrl=localStorage.getItem('avatar')
+      this.key = this.key +1
+    },
     toggleNav() {
       this.isNavCollapsed = !this.isNavCollapsed;
     },
@@ -110,6 +129,7 @@ export default {
     toggleSubMenu() {
       this.isSubMenuVisible = !this.isSubMenuVisible;
     },
+
     logout() {
       var url = "/user/logout"
       this.$axios.delete(url).then((response) => {
@@ -171,6 +191,7 @@ export default {
   margin-right: 20px;
   cursor: pointer;
   position: relative;
+  z-index: 1001;
 }
 
 .avatar {
@@ -178,6 +199,7 @@ export default {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  background-color: blue;
 }
 
 .user-info-box {

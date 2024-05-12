@@ -13,6 +13,7 @@
           <h2>{{ selectedCard.filename }}</h2>
           <p>{{ selectedCard.description }}</p>
           <button @click="downloadFile(selectedCard.fileUrl)">下载</button>
+
         </div>
       </div>
     </transition>
@@ -30,7 +31,7 @@
         </el-form-item>
 
         <el-form-item label="描述">
-          <el-input type="textarea" v-model="form.description"></el-input>
+          <el-input type="textarea" maxlength="145" v-model="form.description"></el-input>
         </el-form-item>
 
         <el-form-item label="文件">
@@ -52,12 +53,13 @@
     </el-dialog>
 
     <button @click="newCard" class="toggle-button">发布资源</button>
+
   </div>
 </template>
 
 <script>
 import { Message } from 'element-ui';
-import download from "downloadjs";
+// import download from "downloadjs";
 export default {
   data() {
     return {
@@ -145,13 +147,15 @@ export default {
         setTimeout(() => { this.progressFlag = false }, 1000) // 一秒后关闭进度条
       }
     },
-    submitForm() {
+     submitForm() {
+
       this.$axios.post('/File/submit', this.form, { timeout: 1000 * 60 * 2 }).then((res) => {
         if (res.code === 200) {
           this.dialogVisible = false
           this.form.filename = ""
           this.form.description = ""
           this.form.fileUrl = ""
+          this.initCard();
           Message({
             type: 'success',
             message: res.msg
@@ -176,6 +180,7 @@ export default {
         })
       }
       )
+      
     },
     findSizeChange(size) {
       this.size = size;
@@ -226,8 +231,14 @@ export default {
       this.dialogVisible = false
     },
     downloadFile(url) {
-      console.log(url)
-      download(url)
+      const a = document.createElement('a')
+      a.setAttribute('href', url)
+      a.setAttribute('download', '1.3.12.2.1107.5.6.1.2387.30200122071903025612700000098.DCM')
+      a.click()
+      
+
+      Message.success('下载开始');
+
     },
     getRandomColor() {
       const randomIndex = Math.floor(Math.random() * this.monetColors.length);
@@ -240,17 +251,19 @@ export default {
 <style scoped>
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
   gap: 20px;
 }
 
 .card {
+
+  color: #fff;
   top: 10px;
   position: relative;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
   border: 2px solid #333;
-  width: 400px;
+  width: 200px;
   height: 100px;
   cursor: pointer;
   left: 20px;
@@ -273,9 +286,11 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+
 }
 
 .modal-content {
+  max-width: 400px;
   background-color: white;
   min-width: 300px;
   min-height: 100px;

@@ -39,6 +39,11 @@ Vue.use(ElementUI);
 Vue.use(vuex);
 Vue.use(VueParticles);
 
+router.afterEach((to, from) => {
+  localStorage.setItem("new",to.path)
+  localStorage.setItem("from",from.path)
+  })
+//导航守卫
 router.beforeEach((to, from, next) => {
 
   const isAuthenticated = localStorage.getItem('token');/* 判断用户是否已登录，例如从后端获取用户信息判断 */

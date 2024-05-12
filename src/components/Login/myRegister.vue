@@ -77,6 +77,7 @@
         </el-row> -->
         <el-form-item>
           <el-button type="primary" @click="submitForm">注册</el-button>
+          <el-button type="primary" @click="returnLogin">返回登录</el-button>
         </el-form-item>
 
       </el-form>
@@ -219,10 +220,9 @@ export default {
 
 
     },
-    //点击返回登录
-    // returnLogin() {
-    //   
-    // }
+    returnLogin() {
+      this.$router.push({ path: "/login" })
+      }
   }
 };
 </script>

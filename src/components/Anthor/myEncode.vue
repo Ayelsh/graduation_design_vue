@@ -73,8 +73,18 @@ export default {
             }
         },
         decryptText(cipherText, key, algorithm) {
-            const bytes = CryptoJS[algorithm].decrypt(cipherText, key);
-            return bytes.toString(CryptoJS.enc.Utf8);
+            switch (algorithm) {
+                case 'DES':
+                    return CryptoJS.DES.decrypt(cipherText, key).toString(CryptoJS.enc.Utf8);
+                case '3DES':
+                    return CryptoJS.TripleDES.decrypt(cipherText, key).toString(CryptoJS.enc.Utf8);
+                case 'AES128':
+                    return CryptoJS.AES.decrypt(cipherText, key).toString(CryptoJS.enc.Utf8);
+                default:
+                    return '';
+            }
+            // const bytes = CryptoJS[algorithm].decrypt(cipherText, key);
+            // return bytes.toString(CryptoJS.enc.Utf8);
         }
     }
 };

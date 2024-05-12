@@ -2,7 +2,7 @@
   <div class="app">
     <!-- 搜索框 -->
     <div class="search-bar">
-      <input type="text" placeholder="Search..." />
+      <input type="text" placeholder="Search..." v-model="searchKey"/>
       <button class="search-btn" @click="search">Search</button>
     </div>
 
@@ -12,14 +12,13 @@
         <img class="avatar-wrapper" :src=post.articleThumbnailUrl alt="帖子封面">
         <div class="post-details">
           <div class="post-title">{{ post.articleTitle }}</div>
-          <div class="post-description">{{ post.articlePreviewContent }}</div>
         </div>
       </div>
     </div>
 
     <div style="display:inline-block;">
       <el-pagination style="padding-top: 15px" @size-change="findSizeChange" @current-change="initPost"
-        :current-page.sync="page" :page-sizes="[2, 4, 6, 8, 10]" :page-size="size"
+        :current-page.sync="page" :page-sizes="[2, 4, 6, 8, 10, 12]" :page-size="size"
         layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
     </div>
@@ -38,9 +37,10 @@ export default {
       posts: [],
       imgurl: [],
       page: 0,
-      size: 10,
+      size: 8,
       total : 0,
-      totalPage:100
+      totalPage:100,
+      searchKey:''
     };
   },
   created() {
@@ -52,7 +52,9 @@ export default {
         //将val赋值给size
         this.size = size;
         //重新去后台查询数据
-        this.initPost()
+        if(this.searchKey === ''){this.initPost()}
+        else{this.search()}
+        
       },
     initPost() {
       if(this.page > this.totalPage){
@@ -89,7 +91,26 @@ export default {
       });
     },
     search() {
-      // 执行搜索逻辑
+      this.$axios.get('/Article/searchPage', {
+        params: {
+          keyValue: this.searchKey,
+          pageNumber: this.page,
+          pageSize: this.size
+        }
+      }).then((response) => {
+        if (response.code === 200) {
+          this.posts = response.data.records;
+          this.total = response.data.total
+          this.totalPage = response.data.pages
+          
+        } else {
+          console.log(response.msg+response.data)
+          Message({
+            type:'error',
+            message:response.msg+response.data
+          })
+        }
+      });
     }
   }
 };
@@ -161,7 +182,7 @@ export default {
   transition: box-shadow 0.3s ease;
   border: 2px solid #333;
   width: 300px;
-  height: 300px;
+  height: 260px;
 }
 
 .post:hover {
@@ -178,7 +199,8 @@ export default {
 }
 
 .post-details {
-  padding: 15px;
+  font-family: Arial, sans-serif;
+  margin: auto;
 }
 
 .post-title {
